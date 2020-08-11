@@ -1,2 +1,2 @@
-# LynxReport
- LynxReport: учёт публикаций :books:
+# LynxReport: учёт публикаций :books:
+
