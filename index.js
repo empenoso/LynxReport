@@ -7,7 +7,7 @@
  * Запуск под Windows: start.bat
  *
  * @author Mikhail Shardin
- * Last updated: 11.08.2020
+ * Last updated: 29.09.2020
  * 
  */
 
@@ -92,18 +92,22 @@ const {
         publications += `<h5 style="margin-top: 8px;">По теме «${TopicsUnique[t]}»:</h5>\n`
         for (var i = 2; i <= rows1.length + 1; i++) {
             if (sheet1.getCellByA1('D' + i).formattedValue != null) {
-                console.log(`Строка ${i}: ${sheet1.getCellByA1('A' + i).formattedValue}.`)
+                console.log(`Строка ${i}: ${sheet1.getCellByA1('A' + i).formattedValue} для ${TopicsUnique[t]}.`)
                 var textArray = sheet1.getCellByA1('C' + i).formattedValue.split("-")
                 date = textArray[2] + '.' + textArray[1] + '.' + textArray[0] //переделываем дату из 2018-05-17 в 17.05.2018
-
-                if (TopicsUnique[t] == sheet1.getCellByA1('F' + i).value && sheet1.getCellByA1('B' + i).value == 'Веб' && sheet1.getCellByA1('D' + i).value != null) {
+                var type = sheet1.getCellByA1('B' + i).value
+                if (TopicsUnique[t] == sheet1.getCellByA1('F' + i).value && type == 'Веб' && sheet1.getCellByA1('D' + i).value != null) {
                     var url = sheet1.getCellByA1('D' + i).value
                     var path = `./articles/${sheet1.getCellByA1('C' + i).formattedValue}_${url.split(/\/\//)[1].split(/\//)[0].replace(/\./g, '-')}_${sheet1.getCellByA1('F' + i).formattedValue}.pdf`
                     publications += `<li>${sheet1.getCellByA1('E' + i).formattedValue}. <a target="_blank" rel="noopener noreferrer" href="${path}">${sheet1.getCellByA1('A' + i).formattedValue}</a> от ${date}.</li>\n`
                 }
 
-                if (TopicsUnique[t] == sheet1.getCellByA1('F' + i).value && sheet1.getCellByA1('B' + i).value != 'Веб' && sheet1.getCellByA1('D' + i).value != null) {
+                if (TopicsUnique[t] == sheet1.getCellByA1('F' + i).value && type != 'Веб' && type != 'Видео' && sheet1.getCellByA1('D' + i).value != null) {
                     publications += `<li>${sheet1.getCellByA1('E' + i).formattedValue}. ${sheet1.getCellByA1('A' + i).formattedValue} в ${sheet1.getCellByA1('D' + i).formattedValue.replace(/\[/gm, '').replace(/\]/gm, '')} от ${date}.</li>\n`
+                }
+
+                if (TopicsUnique[t] == sheet1.getCellByA1('F' + i).value && type == 'Видео' && sheet1.getCellByA1('D' + i).value != null) {
+                    publications += `<li><a target="_blank" rel="noopener noreferrer" href="${sheet1.getCellByA1('D' + i).formattedValue}">${sheet1.getCellByA1('A' + i).formattedValue}</a> от ${date}.</li>\n`
                 }
             }
         }
@@ -121,7 +125,7 @@ const {
     for (var i = 2; i <= rows1.length + 1; i++) { //
         const page = await browser.newPage();
         url = sheet1.getCellByA1('D' + i).value
-        if (sheet1.getCellByA1('B' + i).value == 'Веб' && url != null) {
+        if (type == 'Веб' && url != null) {
             var path = `./articles/${sheet1.getCellByA1('C' + i).formattedValue}_${url.split(/\/\//)[1].split(/\//)[0].replace(/\./g, '-')}_${sheet1.getCellByA1('F' + i).formattedValue}.pdf`
             await page.goto(url);
             await page.waitFor(10 * 1000)
