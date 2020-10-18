@@ -100,7 +100,7 @@ const {
                 if (TopicsUnique[t] == sheet1.getCellByA1('F' + i).value && type == 'Веб' && sheet1.getCellByA1('D' + i).value != null) {
                     var url = sheet1.getCellByA1('D' + i).value
                     var path = `./articles/${sheet1.getCellByA1('C' + i).formattedValue}_${url.split(/\/\//)[1].split(/\//)[0].replace(/\./g, '-')}_${sheet1.getCellByA1('F' + i).formattedValue}.pdf`
-                    publications += `<li>${sheet1.getCellByA1('E' + i).formattedValue}. <a target="_blank" rel="noopener noreferrer" href="${sheet1.getCellByA1('D' + i).formattedValue}">${sheet1.getCellByA1('A' + i).formattedValue}</a> [<a target="_blank" rel="noopener noreferrer" title="Сохраненная копия статьи от ${new Date().toLocaleDateString()}" href="${path}">💾</a>] от ${date}.</li>\n`
+                    publications += `<li>${sheet1.getCellByA1('E' + i).formattedValue}. <a target="_blank" rel="noopener noreferrer" href="${sheet1.getCellByA1('D' + i).formattedValue}">${sheet1.getCellByA1('A' + i).formattedValue}</a> [<a target="_blank" rel="noopener noreferrer" title="Сохраненная копия статьи от ${moment().format('DD-MM-YYYY')}" href="${path}">💾</a>] от ${date}.</li>\n`
                 }
 
                 if (TopicsUnique[t] == sheet1.getCellByA1('F' + i).value && type != 'Веб' && type != 'Видео' && sheet1.getCellByA1('D' + i).value != null) {
