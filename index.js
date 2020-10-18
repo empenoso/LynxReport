@@ -7,13 +7,14 @@
  * Запуск под Windows: start.bat
  *
  * @author Mikhail Shardin
- * Last updated: 01.10.2020
+ * Last updated: 18.10.2020
  * 
  */
 
 const secrets = require('./secrets'); // ключи доступа и идентификаторы
 const fs = require("fs")
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer')
+const moment = require('moment')
 const {
     GoogleSpreadsheet
 } = require("google-spreadsheet");
@@ -74,7 +75,7 @@ const {
         }
         // Выборка сгенерирована ${new Date().toLocaleString()} 
     `
-    fs.writeFileSync(`./piece_google_charts_${new Date().toLocaleDateString()}.txt`, html)
+    fs.writeFileSync(`./piece_google_charts_${moment().format('YYYY-MM-DD')}.txt`, html)
     console.log(`Генерация Timelines Google Charts для html кода с листа ${sheet4.title} завершена.\n`)
 
     console.log(`Генерация списка публикаций с листа ${sheet1.title}.\n`)
@@ -99,7 +100,7 @@ const {
                 if (TopicsUnique[t] == sheet1.getCellByA1('F' + i).value && type == 'Веб' && sheet1.getCellByA1('D' + i).value != null) {
                     var url = sheet1.getCellByA1('D' + i).value
                     var path = `./articles/${sheet1.getCellByA1('C' + i).formattedValue}_${url.split(/\/\//)[1].split(/\//)[0].replace(/\./g, '-')}_${sheet1.getCellByA1('F' + i).formattedValue}.pdf`
-                    publications += `<li>${sheet1.getCellByA1('E' + i).formattedValue}. <a target="_blank" rel="noopener noreferrer" href="${sheet1.getCellByA1('D' + i).formattedValue}">${sheet1.getCellByA1('A' + i).formattedValue}</a> [<a target="_blank" rel="noopener noreferrer" title="Сохраненная копия статьи от ${new Date().toLocaleDateString()}" href="${path}">💾</a>] от ${date}.</li>\n` 
+                    publications += `<li>${sheet1.getCellByA1('E' + i).formattedValue}. <a target="_blank" rel="noopener noreferrer" href="${sheet1.getCellByA1('D' + i).formattedValue}">${sheet1.getCellByA1('A' + i).formattedValue}</a> [<a target="_blank" rel="noopener noreferrer" title="Сохраненная копия статьи от ${new Date().toLocaleDateString()}" href="${path}">💾</a>] от ${date}.</li>\n`
                 }
 
                 if (TopicsUnique[t] == sheet1.getCellByA1('F' + i).value && type != 'Веб' && type != 'Видео' && sheet1.getCellByA1('D' + i).value != null) {
@@ -113,40 +114,41 @@ const {
         }
     }
     publications += `</ol>\nВыборка и PDF копии сайтов сгенерированы автоматически ${new Date().toLocaleString()}.\n<!-- Конец вставки из сгенерированного файла -->`
-    fs.writeFileSync(`./piece_publications_${new Date().toLocaleDateString()}.txt`, publications)
+    fs.writeFileSync(`./piece_publications_${moment().format('YYYY-MM-DD')}.txt`, publications)
     console.log(`Генерация списка публикаций с листа ${sheet1.title} завершена.\n`)
 
     console.log(`Генерация pdf по ссылкам из таблицы ${doc.title}, лист ${sheet1.title}.`)
-    // const browser = await puppeteer.launch({
-    //     ignoreHTTPSErrors: true,
-    //     acceptInsecureCerts: true,
-    //     args: ['--proxy-bypass-list=*', '--disable-gpu', '--disable-dev-shm-usage', '--disable-setuid-sandbox', '--no-first-run', '--no-sandbox', '--no-zygote', '--single-process', '--ignore-certificate-errors', '--ignore-certificate-errors-spki-list', '--enable-features=NetworkService']
-    // });
-    // for (var i = 2; i <= rows1.length + 1; i++) { //
-    //     const page = await browser.newPage();
-    //     url = sheet1.getCellByA1('D' + i).value
-    //     if (type == 'Веб' && url != null) {
-    //         var path = `./articles/${sheet1.getCellByA1('C' + i).formattedValue}_${url.split(/\/\//)[1].split(/\//)[0].replace(/\./g, '-')}_${sheet1.getCellByA1('F' + i).formattedValue}.pdf`
-    //         await page.goto(url);
-    //         await page.waitFor(10 * 1000)
-    //         await page.emulateMedia('screen');
-    //         await page.pdf({
-    //             path: path,
-    //             format: 'A4',
-    //             displayHeaderFooter: true,
-    //             printBackground: true,
-    //             margin: {
-    //                 top: 40,
-    //                 bottom: 40,
-    //                 left: 20,
-    //                 right: 10
-    //             }
-    //         });
-    //         await page.close()
-    //         console.log(`Строка Таблицы №${i}, url адрес статьи ${url}. Создан файл ${path.split(/\//).pop()}.`)
-    //     }
-    // }
-    // await browser.close();
+    const browser = await puppeteer.launch({
+        ignoreHTTPSErrors: true,
+        acceptInsecureCerts: true,
+        args: ['--proxy-bypass-list=*', '--disable-gpu', '--disable-dev-shm-usage', '--disable-setuid-sandbox', '--no-first-run', '--no-sandbox', '--no-zygote', '--single-process', '--ignore-certificate-errors', '--ignore-certificate-errors-spki-list', '--enable-features=NetworkService']
+    });
+    for (var i = 2; i <= rows1.length + 1; i++) { //
+        const page = await browser.newPage();
+        type = sheet1.getCellByA1('B' + i).value
+        url = sheet1.getCellByA1('D' + i).value
+        if (type == 'Веб' && url != null) {
+            var path = `./articles/${sheet1.getCellByA1('C' + i).formattedValue}_${url.split(/\/\//)[1].split(/\//)[0].replace(/\./g, '-')}_${sheet1.getCellByA1('F' + i).formattedValue}.pdf`
+            await page.goto(url);
+            await page.waitFor(10 * 1000)
+            await page.emulateMedia('screen');
+            await page.pdf({
+                path: path,
+                format: 'A4',
+                displayHeaderFooter: true,
+                printBackground: true,
+                margin: {
+                    top: 40,
+                    bottom: 40,
+                    left: 20,
+                    right: 10
+                }
+            });
+            await page.close()
+            console.log(`Строка Таблицы №${i}, url адрес статьи ${url}. Создан файл ${path.split(/\//).pop()}.`)
+        }
+    }
+    await browser.close();
     console.log(`Генерация pdf по ссылкам из таблицы ${doc.title} завершена.`)
 
     let currTime = (new Date()).getTime(); //текущее время в формате Unix Time Stamp - Epoch Converter
