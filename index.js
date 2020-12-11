@@ -6,7 +6,7 @@
  * Запуск под Linux: $ npm start
  * Запуск под Windows: start.bat
  *
- * @author Mikhail Shardin
+ * @author Mikhail Shardin [https://shardin.name/]
  * Last updated: 05.12.2020
  * 
  */
