@@ -1,0 +1,21 @@
+{
+    "timeZone": "America/New_York",
+    "dependencies": {
+        "enabledAdvancedServices": [{
+            "userSymbol": "YouTube",
+            "version": "v3",
+            "serviceId": "youtube"
+        }]
+    },
+    "exceptionLogging": "STACKDRIVER",
+    "runtimeVersion": "V8",
+    "sheets": {
+        "macros": [{
+            "menuName": "Очистить данные",
+            "functionName": "DataCleansing"
+        }, {
+            "menuName": "Загрузить данные",
+            "functionName": "UpdatingArticleViewsCommentsBookmarksRatings"
+        }]
+    }
+}
