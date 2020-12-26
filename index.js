@@ -11,7 +11,7 @@
  * @author Mikhail Shardin [Михаил Шардин] 
  * @site https://shardin.name/
  * 
- * Last updated: 17.12.2020
+ * Last updated: 26.12.2020
  * 
  */
 
@@ -54,7 +54,7 @@ const {
             ])
         }
     }
-    html = `
+    timelines = `
     dataTable.addColumn({
         type: 'string',
         id: 'Заголовок'
@@ -72,7 +72,8 @@ const {
         id: 'End'
     });
     dataTable.addRows([
-        // Начало вставки из сгенерированного файла
+
+        // Начало вставки из сгенерированного файла piece_google_charts_timelines
         ${JSON.stringify(Resources)
             .replace(/\"new/gm, 'new')
             .replace(/\)\"/gm, ')')
@@ -82,8 +83,9 @@ const {
         }
         // Выборка сгенерирована ${new Date().toLocaleString("ru-ru")} 
     `
-    fs.writeFileSync(`./piece_google_charts.txt`, html)
+    fs.writeFileSync(`./piece_google_charts_timelines.txt`, timelines)
     console.log(`Генерация Timelines Google Charts для html кода с листа ${sheet4.title} завершена.\n`)
+
 
     console.log(`Генерация списка публикаций с листа ${sheet1.title}.\n`)
     Topics = []
@@ -93,7 +95,7 @@ const {
     TopicsUnique = Topics.filter((v, i, a) => a.indexOf(v) === i);
     console.log(`Уникальные значения тем: ${JSON.stringify(TopicsUnique)}.\n`)
 
-    var publications = '<!-- Начало вставки из сгенерированного файла -->\n<ol>\n'
+    var publications = '<!-- Начало вставки из сгенерированного файла piece_publications -->\n<ol>\n'
 
     // подгружает статистику публикаций
     publications += `<small class="text-muted">${sheet6.getCellByA1('A1').formattedValue}<br>
@@ -129,43 +131,61 @@ const {
             }
         }
     }
-    publications += `</ol>\n<small>Выборка и PDF копии сайтов сгенерированы автоматически ${new Date().toLocaleString("ru-ru")}.</small>\n<!-- Конец вставки из сгенерированного файла -->`
+    publications += `<h5 style="margin-top: 8px;">Облако слов из названий:</h5>
+    <div id="wordcloud" style="width: 800px; height: 400px;"></div>
+    </ol>
+    <small>Выборка, PDF копии сайтов и облако слов сгенерированы автоматически ${new Date().toLocaleString("ru-ru")}.</small>\n<!-- Конец вставки из сгенерированного файла -->`
     fs.writeFileSync(`./piece_publications.txt`, publications)
     console.log(`Генерация списка публикаций с листа ${sheet1.title} завершена.\n`)
 
-    // console.log(`Генерация pdf по ссылкам из таблицы ${doc.title}, лист ${sheet1.title}.`)
-    // const browser = await puppeteer.launch({
-    //     ignoreHTTPSErrors: true,
-    //     acceptInsecureCerts: true,
-    //     args: ['--proxy-bypass-list=*', '--disable-gpu', '--disable-dev-shm-usage', '--disable-setuid-sandbox', '--no-first-run', '--no-sandbox', '--no-zygote', '--single-process', '--ignore-certificate-errors', '--ignore-certificate-errors-spki-list', '--enable-features=NetworkService']
-    // });
-    // for (var i = 2; i <= rows1.length + 1; i++) { //
-    //     const page = await browser.newPage();
-    //     type = sheet1.getCellByA1('B' + i).value
-    //     url = sheet1.getCellByA1('D' + i).value
-    //     if (type == 'Веб' && url != null) {
-    //         var path = `./articles/${sheet1.getCellByA1('C' + i).formattedValue}_${url.split(/\/\//)[1].split(/\//)[0].replace(/\./g, '-')}_${sheet1.getCellByA1('F' + i).formattedValue}.pdf`
-    //         await page.goto(url);
-    //         await page.waitFor(10 * 1000)
-    //         await page.emulateMedia('screen');
-    //         await page.pdf({
-    //             path: path,
-    //             format: 'A4',
-    //             displayHeaderFooter: true,
-    //             printBackground: true,
-    //             margin: {
-    //                 top: 40,
-    //                 bottom: 40,
-    //                 left: 20,
-    //                 right: 10
-    //             }
-    //         });
-    //         await page.close()
-    //         console.log(`Строка Таблицы №${i} из ${rows1.length + 1}, url адрес статьи ${url}. Создан файл ${path.split(/\//).pop()}.`)
-    //     }
-    // }
-    // await browser.close();
-    // console.log(`Генерация pdf по ссылкам из таблицы ${doc.title} завершена.`)
+
+    console.log(`Генерация облака слов с листа ${sheet1.title}.\n`)
+    var vegachart = `// Начало вставки из сгенерированного файла piece_google_charts_vegachart\n`
+    for (var i = 2; i <= rows1.length + 1; i++) {
+        if (sheet1.getCellByA1('D' + i).formattedValue != null) {
+            vegachart += `"${sheet1.getCellByA1('A' + i).formattedValue}",`
+                .replace(/\n/gm, '')
+            vegachart += `\n`
+        }
+    }
+    vegachart += `// Выборка сгенерирована ${new Date().toLocaleString("ru-ru")}`
+    fs.writeFileSync(`./piece_google_charts_vegachart.txt`, vegachart)
+    console.log(`Генерация облака слов с листа ${sheet1.title} завершена.\n`)
+
+
+    console.log(`Генерация pdf по ссылкам из таблицы ${doc.title}, лист ${sheet1.title}.`)
+    const browser = await puppeteer.launch({
+        ignoreHTTPSErrors: true,
+        acceptInsecureCerts: true,
+        args: ['--proxy-bypass-list=*', '--disable-gpu', '--disable-dev-shm-usage', '--disable-setuid-sandbox', '--no-first-run', '--no-sandbox', '--no-zygote', '--single-process', '--ignore-certificate-errors', '--ignore-certificate-errors-spki-list', '--enable-features=NetworkService']
+    });
+    for (var i = 2; i <= rows1.length + 1; i++) { //
+        const page = await browser.newPage();
+        type = sheet1.getCellByA1('B' + i).value
+        url = sheet1.getCellByA1('D' + i).value
+        if (type == 'Веб' && url != null) {
+            var path = `./articles/${sheet1.getCellByA1('C' + i).formattedValue}_${url.split(/\/\//)[1].split(/\//)[0].replace(/\./g, '-')}_${sheet1.getCellByA1('F' + i).formattedValue}.pdf`
+            await page.goto(url);
+            await page.waitFor(10 * 1000)
+            await page.emulateMedia('screen');
+            await page.pdf({
+                path: path,
+                format: 'A4',
+                displayHeaderFooter: true,
+                printBackground: true,
+                margin: {
+                    top: 40,
+                    bottom: 40,
+                    left: 20,
+                    right: 10
+                }
+            });
+            await page.close()
+            console.log(`Строка Таблицы №${i} из ${rows1.length + 1}, url адрес статьи ${url}. Создан файл ${path.split(/\//).pop()}.`)
+        }
+    }
+    await browser.close();
+    console.log(`Генерация pdf по ссылкам из таблицы ${doc.title} завершена.`)
 
     let currTime = (new Date()).getTime(); //текущее время в формате Unix Time Stamp - Epoch Converter
     let duration = Math.round((currTime - startTime) / 1000 / 60 * 100) / 100; //время выполнения скрипта в минутах
