@@ -140,9 +140,10 @@ const {
     var vegachart = `// Начало вставки из сгенерированного файла piece_google_charts_vegachart\n`
     for (var i = 2; i <= rows1.length + 1; i++) {
         if (sheet1.getCellByA1('D' + i).formattedValue != null) {
-            vegachart += `"${sheet1.getCellByA1('A' + i).formattedValue}",`
+            vegachart += `"${sheet1.getCellByA1('A' + i).formattedValue}",` //${sheet1.getCellByA1('D' + i).formattedValue}
                 .replace(/\n/gm, '')
                 .replace(/.\sСтр.\s\d+/gm, '') // удаляю записи о страницах
+                .replace(/\—/gm, '-') 
             vegachart += `\n`
         }
     }
