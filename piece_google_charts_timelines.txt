@@ -18,9 +18,9 @@
     dataTable.addRows([
 
         // Начало вставки из сгенерированного файла piece_google_charts_timelines
+        ["Публикации","https://habr.com: 22 шт.",new Date(2019, 10),new Date(2021, 01)],
         ["Публикации","https://journal.tinkoff.ru: 12 шт.",new Date(2020, 3),new Date(2020, 12)],
         ["Публикации","https://www.youtube.com: 8 шт.",new Date(2020, 8),new Date(2020, 09)],
-        ["Публикации","https://habr.com: 21 шт.",new Date(2019, 10),new Date(2020, 08)],
         ["Публикации","https://github.com: 9 шт.",new Date(2019, 8),new Date(2020, 03)],
         ["Публикации","https://medium.com: 1 шт.",new Date(2020, 1),new Date(2020, 02)],
         ["Публикации","https://t.me: 4 шт.",new Date(2019, 2),new Date(2020, 01)],
@@ -46,5 +46,5 @@
         ["Публикации","Журнал Домашний компьютер: 2 шт.",new Date(2004, 5),new Date(2005, 05)],
         ["Публикации","http://old.computerra.ru: 1 шт.",new Date(2004, 2),new Date(2004, 03)],
         ["Публикации","Компьютерный еженедельник Компьютерра: 1 шт.",new Date(2004, 2),new Date(2004, 03)],
-        // Выборка сгенерирована 2020-12-26 17:04:51 
+        // Выборка сгенерирована 2021-1-5 19:58:19 
     
