@@ -7,12 +7,12 @@
  * @author Mikhail Shardin [Михаил Шардин] 
  * @site https://shardin.name/
  * 
- * Last updated: 17.12.2020
+ * Last updated: 04.02.2021
  * 
  */
 
 function journal_tinkoff_ru(url) {
-    Utilities.sleep(10 * 1000) // 10 sec
+    Utilities.sleep(10 * 1000) // 15 sec
     try {
         var html = UrlFetchApp.fetch(url).getContentText();
         let Views = +html.match(/svg>(.*?)K<\/div><a href="#comments"/)[1] * 1000
@@ -56,8 +56,8 @@ function habr_com(url) {
         var html = UrlFetchApp.fetch(url).getContentText();
         let Views = +html.match(/<span class="post-stats__views-count">(.*?)k<\/span>/)[1]
             .replace(/\,/g, '.') * 1000
-        let Comments = +html.match(/<span class="post-stats__comments-count" title="Читать комментарии">(.*?)<\/span>/)[1]
-        let Bookmarks = +html.match(/<span class="bookmark__counter js-favs_count" title="Количество пользователей, добавивших публикацию в закладки">(.*?)<\/span>/)[1]
+        let Comments = +html.match(/title="Читать комментарии">(.*?)<\/span>/)[1]
+        let Bookmarks = +html.match(/title="Количество пользователей, добавивших публикацию в закладки">(.*?)<\/span>/)[1]
         var searchstringRatings = 'onclick="posts_vote_result'
         var index = html.search(searchstringRatings);
         if (index >= 0) {
