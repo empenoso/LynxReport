@@ -146,3 +146,14 @@ function vc_ru(url) {
         return `?|?|?|?`
     }
 }
+
+function testSite() {
+    var url = 'https://www.tiktok.com/@di.maiers/video/6938025243042794753';
+    var html = UrlFetchApp.fetch(url, {
+        muteHttpExceptions: true
+    });
+    title = html.getContentText().match(/<title>(.*?)<\/title>/)[1]
+
+    Logger.log(`Для ${url}: название = ${title}.`)
+    return `${title}`
+}
