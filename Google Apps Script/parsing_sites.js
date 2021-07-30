@@ -62,7 +62,7 @@ function habr_com(url) {
         if (index >= 0) {
             var pos = index + searchstringComments.length
             var Comments = html.substring(pos, pos + 70)
-            Comments = Comments
+            Comments = +Comments
                 .split('</span>')[0]
                 .replace(/<\/sp/g, '');
             (!Comments || Comments === undefined) ? Comments = 0: Comments
