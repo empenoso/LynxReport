@@ -7,11 +7,11 @@
  * @author Mikhail Shardin [Михаил Шардин] 
  * @site https://shardin.name/
  * 
- * Last updated: 02.04.2021
+ * Last updated: 30.07.2021
  * 
  */
 
-function journal_tinkoff_ru(url) {
+ function journal_tinkoff_ru(url) {
     Utilities.sleep(10 * 1000) // 15 sec
     try {
         var html = UrlFetchApp.fetch(url).getContentText();
@@ -54,11 +54,21 @@ function youtube_com(url) {
 function habr_com(url) {
     try {
         var html = UrlFetchApp.fetch(url).getContentText();
-        let Views = +html.match(/<span class="post-stats__views-count">(.*?)k<\/span>/)[1]
+        let Views = +html.match(/<span class="tm-icon-counter__value">(.*?)K<\/span>/)[1]
             .replace(/\,/g, '.') * 1000
-        let Comments = +html.match(/title="Читать комментарии">(.*?)<\/span>/)[1]
-        let Bookmarks = +html.match(/title="Количество пользователей, добавивших публикацию в закладки">(.*?)<\/span>/)[1]
-        var searchstringRatings = 'onclick="posts_vote_result'
+        // let Comments = `?`// +html.match(/class="tm-comments__comments-count">(.*?)<\/span>/)[1]
+        var searchstringComments = '       Комментарии '
+        var index = html.search(searchstringComments);
+        if (index >= 0) {
+            var pos = index + searchstringComments.length
+            var Comments = html.substring(pos, pos + 70)
+            Comments = Comments
+                .split('</span>')[0]
+                .replace(/<\/sp/g, '');
+            (!Comments || Comments === undefined) ? Comments = 0: Comments
+        }
+        let Bookmarks = `?` // +html.match(/title="Количество пользователей, добавивших публикацию в закладки" class="bookmarks-button__counter">(.*?)<\/span>/)[1]
+        var searchstringRatings = 'class="tm-votes-meter__value tm-votes-meter__value_positive tm-votes-meter__value_medium'
         var index = html.search(searchstringRatings);
         if (index >= 0) {
             var pos = index + searchstringRatings.length
@@ -147,7 +157,7 @@ function vc_ru(url) {
     }
 }
 
-function testSite() {
+function testTiktok() {
     var url = 'https://www.tiktok.com/@di.maiers/video/6938025243042794753';
     var html = UrlFetchApp.fetch(url, {
         muteHttpExceptions: true
@@ -156,4 +166,9 @@ function testSite() {
 
     Logger.log(`Для ${url}: название = ${title}.`)
     return `${title}`
+}
+
+function testHabr() {
+    var url = 'https://habr.com/ru/post/562546/';
+    VCBR = habr_com(url)
 }
