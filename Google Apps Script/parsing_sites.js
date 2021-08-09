@@ -7,18 +7,18 @@
  * @author Mikhail Shardin [Михаил Шардин] 
  * @site https://shardin.name/
  * 
- * Last updated: 30.07.2021
+ * Last updated: 09.08.2021
  * 
  */
 
- function journal_tinkoff_ru(url) {
+function journal_tinkoff_ru(url) {
     Utilities.sleep(10 * 1000) // 15 sec
     try {
         var html = UrlFetchApp.fetch(url).getContentText();
         let Views = +html.match(/svg>(.*?)K<\/div><a href="#comments"/)[1] * 1000
         let Comments = +html.match(/class="_2lm8E">(.*?)<\/span><\/div><\/a><div class="_3teJk _3Qz4J">/)[1]
         let Bookmarks = +html.match(/<span class="_1T6f2">(.*?)<\/span><\/button>/)[1]
-        let Ratings = +html.match(/<span class="_2vtFp" style="color:#000">(.*?)<\/span><button class="_9GPyX _2ag8l"/)[1];
+        let Ratings = +html.match(/<span class="_sRng z2yqt">(.*?)<\/span><button type="button" class="_1bWSy _1eR8l"/)[1];
         (!Ratings || Ratings === undefined) ? Ratings = 0: Ratings
 
         Logger.log(`Для ${url}:\nПросмотры = ${Views} \nКомментарии = ${Comments} \nЗакладки = ${Bookmarks} \nРейтинг = ${Ratings}.`)
