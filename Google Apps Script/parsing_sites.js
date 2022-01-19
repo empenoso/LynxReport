@@ -7,19 +7,18 @@
  * @author Mikhail Shardin [Михаил Шардин] 
  * @site https://shardin.name/
  * 
- * Last updated: 09.08.2021
+ * Last updated: 19.02.2022
  * 
  */
 
 function journal_tinkoff_ru(url) {
-    Utilities.sleep(10 * 1000) // 15 sec
+    Utilities.sleep(7 * 1000) // 15 sec
     try {
         var html = UrlFetchApp.fetch(url).getContentText();
-        let Views = +html.match(/svg>(.*?)K<\/div><a href="#comments"/)[1] * 1000
-        let Comments = +html.match(/class="_2lm8E">(.*?)<\/span><\/div><\/a><div class="_3teJk _3Qz4J">/)[1]
-        let Bookmarks = +html.match(/<span class="_1T6f2">(.*?)<\/span><\/button>/)[1]
-        let Ratings = +html.match(/<span class="_sRng z2yqt">(.*?)<\/span><button type="button" class="_1bWSy _1eR8l"/)[1];
-        (!Ratings || Ratings === undefined) ? Ratings = 0: Ratings
+        let Views = +html.match(/,"views":(.*?),"favoritesCount":/)[1] 
+        let Comments = +html.match(/"stats":{"comments":(.*?),"/)[1]
+        let Bookmarks = +html.match(/,"favoritesCount":(.*?)}/)[1] // +html.match(/<span class="_1T6f2">(.*?)<\/span><\/button>/)[1]
+        let Ratings = `?` // +html.match(/<span class="_sRng z2yqt">(.*?)<\/span><button type="button" class="_1bWSy _1eR8l"/)[1];        
 
         Logger.log(`Для ${url}:\nПросмотры = ${Views} \nКомментарии = ${Comments} \nЗакладки = ${Bookmarks} \nРейтинг = ${Ratings}.`)
         return `${Views}|${Comments}|${Bookmarks}|${Ratings}`
@@ -41,7 +40,7 @@ function youtube_com(url) {
         Views = stat.viewCount
         Comments = '-'
         Bookmarks = '-'
-        Ratings = "+" + stat.likeCount + " / -" + stat.dislikeCount
+        Ratings = "+" + stat.likeCount + " / -?" //+ stat.dislikeCount
 
         Logger.log(`Для ${url}:\nПросмотры = ${Views} \nКомментарии = ${Comments} \nЗакладки = ${Bookmarks} \nРейтинг = ${Ratings}.`)
         return `${Views}|${Comments}|${Bookmarks}|${Ratings}`
@@ -52,7 +51,7 @@ function youtube_com(url) {
 }
 
 function habr_com(url) {
-    try {
+    // try {
         var html = UrlFetchApp.fetch(url).getContentText();
         let Views = +html.match(/<span class="tm-icon-counter__value">(.*?)K<\/span>/)[1]
             .replace(/\,/g, '.') * 1000
@@ -67,24 +66,14 @@ function habr_com(url) {
                 .replace(/<\/sp/g, '');
             (!Comments || Comments === undefined) ? Comments = 0: Comments
         }
-        let Bookmarks = `?` // +html.match(/title="Количество пользователей, добавивших публикацию в закладки" class="bookmarks-button__counter">(.*?)<\/span>/)[1]
-        var searchstringRatings = 'class="tm-votes-meter__value tm-votes-meter__value_positive tm-votes-meter__value_medium'
-        var index = html.search(searchstringRatings);
-        if (index >= 0) {
-            var pos = index + searchstringRatings.length
-            var Ratings = html.substring(pos, pos + 70)
-            Ratings = Ratings
-                .split('</span>')[0]
-                .split('">')[1]
-                .replace(/<\/sp/g, '');
-            (!Ratings || Ratings === undefined) ? Ratings = 0: Ratings
-        }
+        let Bookmarks = `?` // +html.match(/<span title="Количество пользователей, добавивших публикацию в закладки" class="bookmarks-button__counter">(.*?)<\/span>/)[1]
+        let Ratings = +html.match(/class="tm-votes-meter__value tm-votes-meter__value_positive tm-votes-meter__value_appearance-article tm-votes-meter__value_rating">(.*?)<\/span>/)[1]
         Logger.log(`Для ${url}:\nПросмотры = ${Views} \nКомментарии = ${Comments} \nЗакладки = ${Bookmarks} \nРейтинг = ${Ratings}.`)
         return `${Views}|${Comments}|${Bookmarks}|${Ratings}`
-    } catch (error) {
-        Logger.log(`Ошибка чтения данных для ${url}.`)
-        return `?|?|?|?`
-    }
+    // } catch (error) {
+    //     Logger.log(`Ошибка чтения данных для ${url}.`)
+    //     return `?|?|?|?`
+    // }
 }
 
 function github_com(url) {
@@ -169,6 +158,12 @@ function testTiktok() {
 }
 
 function testHabr() {
-    var url = 'https://habr.com/ru/post/562546/';
+    var url = 'https://habr.com/ru/post/645935/';
     VCBR = habr_com(url)
 }
+
+function testTinkoff() {
+    var url = 'https://journal.tinkoff.ru/sell-apartment-buy-bonds/';
+    VCBR = journal_tinkoff_ru(url)
+}
+
