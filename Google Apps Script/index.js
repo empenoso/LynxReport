@@ -7,7 +7,7 @@
  * @author Mikhail Shardin [Михаил Шардин] 
  * @site https://shardin.name/
  * 
- * Last updated: 16.12.2020
+ * Last updated: 19.01.2022
  * 
  */
 
@@ -46,9 +46,10 @@ function UpdatingArticleViewsCommentsBookmarksRatings() {
     var data = sheet.getRange("a" + RowFirst + ":aa" + RowLast).getValues()
 
     var startTime = (new Date()).getTime(); //записываем текущее время в формате Unix Time Stamp - Epoch Converter
-
     var ViewsCommentsBookmarksRatings = []
-    for (x = RowFirst; x < (data.length + RowFirst); x++) {
+
+    // for (x = 49; x < 195; x++) { // для тестов
+    for (x = RowFirst; x < (data.length + RowFirst); x++) {   // для основного запуска
         if (data[x - RowFirst][1] == "Веб" || data[x - RowFirst][1] == "Видео") {
             var url = data[x - RowFirst][3];
             var domainName = url.match(/^(?:\/\/|[^\/]+)*/);
