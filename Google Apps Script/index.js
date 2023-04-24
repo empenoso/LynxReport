@@ -7,48 +7,21 @@
  * @author Mikhail Shardin [Михаил Шардин] 
  * @site https://shardin.name/
  * 
- * Last updated: 19.01.2022
+ * Last updated: 21.04.2023
  * 
  */
-
-function DataCleansing() {
-    var startTime = (new Date()).getTime(); //записываем текущее время в формате Unix Time Stamp - Epoch Converter
-
-    var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
-    var sheet = spreadsheet.getSheetByName("Данные");
-
-    var RowFirst = 2 //начальная строка выполнения скрипта 
-    var RowLast = sheet.getLastRow() - 2; //конечная строка выполнения скрипта
-    var data = sheet.getRange("a" + RowFirst + ":aa" + RowLast).getValues()
-
-    var clearContent = []
-    for (x = RowFirst; x < (data.length + RowFirst); x++) {
-        clearContent.push([
-            "пусто",
-            "пусто",
-            "пусто",
-            "пусто"
-        ])
-    }
-    sheet.getRange("H" + RowFirst + ":K" + (RowFirst + clearContent.length - 1)).setValues(clearContent);
-
-    var currTime = (new Date()).getTime(); //текущее время в формате Unix Time Stamp - Epoch Converter
-    var durationNew = Math.round((currTime - startTime) / 1000 / 60 * 100) / 100; //время выполнения скрипта в минутах
-    sheet.getRange(sheet.getLastRow() + 0, 1).setValue(`Данные очищены ${Utilities.formatDate(new Date(), "GMT+5", "dd.MM.yyyy в HH:mm:ss")} за ${durationNew} секунд.`);
-}
 
 function UpdatingArticleViewsCommentsBookmarksRatings() {
     var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
     var sheet = spreadsheet.getSheetByName("Данные");
 
     var RowFirst = 2 //начальная строка выполнения скрипта 
-    var RowLast = 10 // sheet.getLastRow() - 2; //конечная строка выполнения скрипта
+    var RowLast =  sheet.getLastRow() - 2; //конечная строка выполнения скрипта
     var data = sheet.getRange("a" + RowFirst + ":aa" + RowLast).getValues()
 
     var startTime = (new Date()).getTime(); //записываем текущее время в формате Unix Time Stamp - Epoch Converter
     var ViewsCommentsBookmarksRatings = []
 
-    // for (x = 9; x < 10+1; x++) { // для тестов
     for (x = RowFirst; x < (data.length + RowFirst); x++) {   // для основного запуска
         if (data[x - RowFirst][1] == "Веб" || data[x - RowFirst][1] == "Видео") {
             var url = data[x - RowFirst][3];
@@ -87,7 +60,7 @@ function UpdatingArticleViewsCommentsBookmarksRatings() {
                     VCBR.split('|')[2],
                     VCBR.split('|')[3]
                 ])
-            } else if (domainName == 'https://t.me') {
+            } else             if (domainName == 'https://t.me') {
                 VCBR = t_me(url)
                 ViewsCommentsBookmarksRatings.push([
                     VCBR.split('|')[0],
@@ -95,7 +68,7 @@ function UpdatingArticleViewsCommentsBookmarksRatings() {
                     VCBR.split('|')[2],
                     VCBR.split('|')[3]
                 ])
-            } else if (domainName == 'https://3dtoday.ru') {
+            }             else if (domainName == 'https://3dtoday.ru') {
                 VCBR = d3today_ru(url)
                 ViewsCommentsBookmarksRatings.push([
                     VCBR.split('|')[0],
@@ -136,4 +109,30 @@ function UpdatingArticleViewsCommentsBookmarksRatings() {
     sheet.getRange(sheet.getLastRow() + 0, 1).setValue(`Скрипт обновлен ${Utilities.formatDate(new Date(), "GMT+5", "dd.MM.yyyy в HH:mm:ss")} за ${durationNew} минуту.`);
 
     Logger.log(`Время сервера ${(new Date()).toLocaleString("ru-ru")}.\nДлительность работы: ${durationNew}.`);
+}
+
+function DataCleansing() {
+    var startTime = (new Date()).getTime(); //записываем текущее время в формате Unix Time Stamp - Epoch Converter
+
+    var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = spreadsheet.getSheetByName("Данные");
+
+    var RowFirst = 2 //начальная строка выполнения скрипта 
+    var RowLast = sheet.getLastRow() - 2; //конечная строка выполнения скрипта
+    var data = sheet.getRange("a" + RowFirst + ":aa" + RowLast).getValues()
+
+    var clearContent = []
+    for (x = RowFirst; x < (data.length + RowFirst); x++) {
+        clearContent.push([
+            "пусто",
+            "пусто",
+            "пусто",
+            "пусто"
+        ])
+    }
+    sheet.getRange("H" + RowFirst + ":K" + (RowFirst + clearContent.length - 1)).setValues(clearContent);
+
+    var currTime = (new Date()).getTime(); //текущее время в формате Unix Time Stamp - Epoch Converter
+    var durationNew = Math.round((currTime - startTime) / 1000 / 60 * 100) / 100; //время выполнения скрипта в минутах
+    sheet.getRange(sheet.getLastRow() + 0, 1).setValue(`Данные очищены ${Utilities.formatDate(new Date(), "GMT+5", "dd.MM.yyyy в HH:mm:ss")} за ${durationNew} секунд.`);
 }
