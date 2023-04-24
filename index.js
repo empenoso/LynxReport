@@ -11,7 +11,7 @@
  * @author Mikhail Shardin [Михаил Шардин] 
  * @site https://shardin.name/
  * 
- * Last updated: 05.01.2021
+ * Last updated: 24.04.2023
  * 
  */
 
@@ -98,12 +98,14 @@ const {
     var publications = '<!-- Начало вставки из сгенерированного файла piece_publications -->\n<ol>\n'
 
     // подгружает статистику публикаций
-    publications += `<small class="text-muted">${sheet6.getCellByA1('A1').formattedValue}<br>
+    publications += `Ниже Вы можете бесплатно скачать любую из моих опубликованных статей. Для этого нажмите на значок 💾
+    справа от названия материала. Также Вы можете принять участие в обсуждении интересных Вам тем, просто
+    перейдя по ссылке - комментарии есть у всех статей.<br>\n
+    <small class="text-muted">${sheet6.getCellByA1('A1').formattedValue}<br>
     <ul>
         <li>${sheet6.getCellByA1('A3').formattedValue}</li>
         <li>${sheet6.getCellByA1('A4').formattedValue}</li>
     </ul>
-    Хотите знать откуда такие точные цифры? Спросите у меня.
     </small>\n`
 
     // дальше уже разбирает по темам
@@ -143,7 +145,7 @@ const {
             vegachart += `"${sheet1.getCellByA1('A' + i).formattedValue}",` //${sheet1.getCellByA1('D' + i).formattedValue}
                 .replace(/\n/gm, '')
                 .replace(/.\sСтр.\s\d+/gm, '') // удаляю записи о страницах
-                .replace(/\—/gm, '-') 
+                .replace(/\—/gm, '-')
             vegachart += `\n`
         }
     }
@@ -153,36 +155,49 @@ const {
 
 
     console.log(`Генерация pdf по ссылкам из таблицы ${doc.title}, лист ${sheet1.title}.`)
-    const browser = await puppeteer.launch({
-        ignoreHTTPSErrors: true,
-        acceptInsecureCerts: true,
-        args: ['--proxy-bypass-list=*', '--disable-gpu', '--disable-dev-shm-usage', '--disable-setuid-sandbox', '--no-first-run', '--no-sandbox', '--no-zygote', '--single-process', '--ignore-certificate-errors', '--ignore-certificate-errors-spki-list', '--enable-features=NetworkService']
-    });
-    for (var i = 2; i <= rows1.length + 1; i++) { //
+    const browser = await puppeteer.launch();
+    // const browser = await puppeteer.launch({
+    //     ignoreHTTPSErrors: true,
+    //     acceptInsecureCerts: true,
+    //     args: ['--proxy-bypass-list=*', '--disable-gpu', '--disable-dev-shm-usage', '--disable-setuid-sandbox', '--no-first-run', '--no-sandbox', '--no-zygote', '--single-process', '--ignore-certificate-errors', '--ignore-certificate-errors-spki-list', '--enable-features=NetworkService']
+    // });
+
+    for (var i = 2; i <= rows1.length + 1; i++) { //                
         const page = await browser.newPage();
+        await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36');
+        await page.setDefaultNavigationTimeout(0);
+
         type = sheet1.getCellByA1('B' + i).value
         url = sheet1.getCellByA1('D' + i).value
+        const footer = `<style>#header, #footer { padding: 0 !important; }</style><div class="footer" style="padding: 0 !important; margin: 0; -webkit-print-color-adjust: exact; background-color: blue; color: white; width: 100%; text-align: right; font-size: 12px;">${url} | Михаил Шардин, https://shardin.name/ <br /> Страница <span class="pageNumber"></span> из <span class="totalPages"></span> </div>`;
+        console.log(`Строка №${i} из ${rows1.length + 1} для ${url}.`)
+
         if (type == 'Веб' && url != null) {
-            var path = `./articles/${sheet1.getCellByA1('C' + i).formattedValue}_${url.split(/\/\//)[1].split(/\//)[0].replace(/\./g, '-')}_${sheet1.getCellByA1('F' + i).formattedValue}.pdf`
-            await page.goto(url);
-            await page.waitFor(10 * 1000)
-            await page.emulateMedia('screen');
-            await page.pdf({
+            path = `./articles/${sheet1.getCellByA1('C' + i).formattedValue}_${url.split(/\/\//)[1].split(/\//)[0].replace(/\./g, '-')}_${sheet1.getCellByA1('F' + i).formattedValue}.pdf`
+
+            await page.goto(url, {
+                waitUntil: 'networkidle0'
+            });
+            await page.waitFor(20 * 1000)
+            await page.emulateMediaType('screen');
+            const pdf = await page.pdf({
                 path: path,
-                format: 'A4',
-                displayHeaderFooter: true,
-                printBackground: true,
                 margin: {
                     top: 40,
                     bottom: 40,
                     left: 20,
                     right: 10
-                }
+                },
+                printBackground: true,
+                displayHeaderFooter: true,
+                footerTemplate: footer,
+                format: 'A4',
             });
+            console.log(`Создан файл ${path.split(/\//).pop()}.\n`)
             await page.close()
-            console.log(`Строка Таблицы №${i} из ${rows1.length + 1}, url адрес статьи ${url}. Создан файл ${path.split(/\//).pop()}.`)
         }
     }
+
     await browser.close();
     console.log(`Генерация pdf по ссылкам из таблицы ${doc.title} завершена.`)
 
