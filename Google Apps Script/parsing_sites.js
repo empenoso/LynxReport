@@ -7,7 +7,7 @@
  * @author Mikhail Shardin [Михаил Шардин] 
  * @site https://shardin.name/
  * 
- * Last updated: 21.04.2023
+ * Last updated: 16.06.2023
  * 
  */
 
