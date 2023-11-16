@@ -11,7 +11,7 @@
  * @author Mikhail Shardin [Михаил Шардин] 
  * @site https://shardin.name/
  * 
- * Last updated: 24.04.2023
+ * Last updated: 16.11.2023
  * 
  */
 
@@ -155,17 +155,18 @@ const {
 
 
     console.log(`Генерация pdf по ссылкам из таблицы ${doc.title}, лист ${sheet1.title}.`)
-    const browser = await puppeteer.launch();
-    // const browser = await puppeteer.launch({
-    //     ignoreHTTPSErrors: true,
-    //     acceptInsecureCerts: true,
-    //     args: ['--proxy-bypass-list=*', '--disable-gpu', '--disable-dev-shm-usage', '--disable-setuid-sandbox', '--no-first-run', '--no-sandbox', '--no-zygote', '--single-process', '--ignore-certificate-errors', '--ignore-certificate-errors-spki-list', '--enable-features=NetworkService']
-    // });
+
+    const browser = await puppeteer.launch({
+        headless: "new", //"new" //false - для теста
+        ignoreHTTPSErrors: true,
+        acceptInsecureCerts: true,
+        args: ['--proxy-bypass-list=*', '--disable-gpu', '--disable-dev-shm-usage', '--disable-setuid-sandbox', '--no-first-run', '--no-sandbox', '--no-zygote', '--single-process', '--ignore-certificate-errors', '--ignore-certificate-errors-spki-list', '--enable-features=NetworkService']
+    });
 
     for (var i = 2; i <= rows1.length + 1; i++) { //                
         const page = await browser.newPage();
-        await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36');
-        await page.setDefaultNavigationTimeout(0);
+        // await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36');
+        // await page.setDefaultNavigationTimeout(0);
 
         type = sheet1.getCellByA1('B' + i).value
         url = sheet1.getCellByA1('D' + i).value
@@ -176,9 +177,12 @@ const {
             path = `./articles/${sheet1.getCellByA1('C' + i).formattedValue}_${url.split(/\/\//)[1].split(/\//)[0].replace(/\./g, '-')}_${sheet1.getCellByA1('F' + i).formattedValue}.pdf`
 
             await page.goto(url, {
-                waitUntil: 'networkidle0'
+                waitUntil: 'load',
+                // waitUntil: 'networkidle0'
+                // Remove the timeout
+                timeout: 0
             });
-            await page.waitFor(20 * 1000)
+
             await page.emulateMediaType('screen');
             const pdf = await page.pdf({
                 path: path,

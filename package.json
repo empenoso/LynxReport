@@ -4,10 +4,10 @@
   "description": "Учёт собственных публикаций.",
   "main": "index.js",
   "dependencies": {
-    "delay": "^4.4.0",
-    "google-spreadsheet": "^3.0.11",
-    "puppeteer": "^3.3.0",
-    "moment": ""
+    "delay": "",
+    "google-spreadsheet": "^3.3.0",
+    "moment": "",
+    "puppeteer": ""
   },
   "scripts": {
     "start": "node index.js"
