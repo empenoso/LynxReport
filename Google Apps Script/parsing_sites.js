@@ -7,7 +7,7 @@
  * @author Mikhail Shardin [Михаил Шардин] 
  * @site https://shardin.name/
  * 
- * Last updated: 16.06.2023
+ * Last updated: 25.12.2023
  * 
  */
 
@@ -63,15 +63,15 @@ function youtube_com(url) {
 }
 
 function testHabr() {
-    var url = 'https://habr.com/post/481566/';
+    var url = 'https://habr.com/ru/articles/777376/';
     VCBR = habr_com(url)
 }
 
 function habr_com(url) {
-    // try {
+    try {
     var html = UrlFetchApp.fetch(url).getContentText();
     // Logger.log(`html:\n${html}.`)
-    let Views = +html.match(/<span class="tm-icon-counter__value">(.*?)K<\/span>/)[1]
+    let Views = +html.match(/<span class=\"tm-icon-counter__value\">(.*?)K<\/span>/)[1]
         .replace(/\,/g, '.') * 1000
     // let Comments = `?`// +html.match(/class="tm-comments__comments-count">(.*?)<\/span>/)[1]
     var searchstringComments = '       Комментарии '
@@ -93,13 +93,23 @@ function habr_com(url) {
         Bookmarks = +Bookmarks.match(/\d{1,4}/);
         (!Bookmarks || Bookmarks === undefined) ? Bookmarks = 0: Bookmarks
     }
-    let Ratings = +html.match(/tm-votes-meter__value_appearance-article tm-votes-meter__value_rating\">(.*?)<\/span>/)[1]
+
+    // let Ratings = 0 +html.match(/tm-votes-lever__score-counter tm-votes-lever__score-counter tm-votes-lever__score-counter_positive\">(.*?)<\/span>/)[1]
+    var searchstringRatings = 'tm-votes-lever__score-counter_positive'
+    var index = html.search(searchstringRatings);
+    if (index >= 0) {
+        var pos = index + searchstringRatings.length
+        var Ratings = html.substring(pos, pos + 20)
+        Ratings = +Ratings.match(/\d{1,4}/);
+        (!Ratings || Ratings === undefined) ? Ratings = 0: Ratings
+    }
+
     Logger.log(`Для ${url}:\nПросмотры = ${Views} \nКомментарии = ${Comments} \nЗакладки = ${Bookmarks} \nРейтинг = ${Ratings}.`)
     return `${Views}|${Comments}|${Bookmarks}|${Ratings}`
-    // } catch (error) {
-    //     Logger.log(`Ошибка чтения данных для ${url}.`)
-    //     return `?|?|?|?`
-    // }
+    } catch (error) {
+        Logger.log(`Ошибка чтения данных для ${url}.`)
+        return `?|?|?|?`
+    }
 }
 
 function github_com(url) {
