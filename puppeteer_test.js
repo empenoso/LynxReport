@@ -15,8 +15,8 @@ const puppeteer = require('puppeteer');
 
     // Website URL to export as pdf
     // const website_url = 'https://habr.com/ru/articles/773620/';
-    const website_url = 'https://journal.tinkoff.ru/guide/how-to-rent/'; 
-    // const website_url = 'https://www.bannerbear.com/blog/how-to-download-images-from-a-website-using-puppeteer/'; 
+    // const website_url = 'https://journal.tinkoff.ru/guide/how-to-rent/'; 
+    const website_url = 'https://www.bannerbear.com/blog/how-to-download-images-from-a-website-using-puppeteer/'; 
     
 
 

@@ -11,7 +11,7 @@
  * @author Mikhail Shardin [Михаил Шардин] 
  * @site https://shardin.name/
  * 
- * Last updated: 16.11.2023
+ * Last updated: 02.05.2024
  * 
  */
 
@@ -30,9 +30,9 @@ const {
     const doc = new GoogleSpreadsheet('18YPDc6bs17CNwd8NuLpBUn9OZyMigVjYKbCQ1_--Dkw') // https://docs.google.com/spreadsheets/d/18YPDc6bs17CNwd8NuLpBUn9OZyMigVjYKbCQ1_--Dkw/edit#gid=848229268
     doc.useApiKey(secrets.google_spreadsheet_key_read_only); // https://theoephraim.github.io/node-google-spreadsheet/#/getting-started/authentication?id=api-key
     await doc.loadInfo();
-    const sheet1 = doc.sheetsByIndex[1]
-    const sheet4 = doc.sheetsByIndex[4]
-    const sheet6 = doc.sheetsByIndex[6]
+    const sheet1 = doc.sheetsByIndex[1] // Данные
+    const sheet4 = doc.sheetsByIndex[5] // Ресурсы
+    const sheet6 = doc.sheetsByIndex[8] // shardin.name
     const rows1 = await sheet1.getRows()
     const rows4 = await sheet4.getRows()
     const rows6 = await sheet6.getRows()
