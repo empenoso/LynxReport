@@ -154,55 +154,75 @@ const {
     console.log(`Генерация облака слов с листа ${sheet1.title} завершена.\n`)
 
 
+
     console.log(`Генерация pdf по ссылкам из таблицы ${doc.title}, лист ${sheet1.title}.`)
 
-    const browser = await puppeteer.launch({
-        headless: "new", //"new" //false - для теста
-        ignoreHTTPSErrors: true,
-        acceptInsecureCerts: true,
-        args: ['--proxy-bypass-list=*', '--disable-gpu', '--disable-dev-shm-usage', '--disable-setuid-sandbox', '--no-first-run', '--no-sandbox', '--no-zygote', '--single-process', '--ignore-certificate-errors', '--ignore-certificate-errors-spki-list', '--enable-features=NetworkService']
-    });
-
-    for (var i = 2; i <= rows1.length + 1; i++) { //                
-        const page = await browser.newPage();
-        // await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36');
-        // await page.setDefaultNavigationTimeout(0);
-
+    for (var i = 2; i <= rows1.length + 1; i++) { //    
+        // Define the URL of the page you want to save as PDF
         type = sheet1.getCellByA1('B' + i).value
         url = sheet1.getCellByA1('D' + i).value
-        const footer = `<style>#header, #footer { padding: 0 !important; }</style><div class="footer" style="padding: 0 !important; margin: 0; -webkit-print-color-adjust: exact; background-color: blue; color: white; width: 100%; text-align: right; font-size: 12px;">${url} | Михаил Шардин, https://shardin.name/ <br /> Страница <span class="pageNumber"></span> из <span class="totalPages"></span> </div>`;
+
+        // Launch a new browser instance
+        const browser = await puppeteer.launch({
+            headless: true, // Run in headless mode, set to false for debugging
+        });
+
+        // Open a new page
+        const page = await browser.newPage();
+
         console.log(`Строка №${i} из ${rows1.length + 1} для ${url}.`)
 
         if (type == 'Веб' && url != null) {
             path = `./articles/${sheet1.getCellByA1('C' + i).formattedValue}_${url.split(/\/\//)[1].split(/\//)[0].replace(/\./g, '-')}_${sheet1.getCellByA1('F' + i).formattedValue}.pdf`
 
+            // Navigate to the desired URL
             await page.goto(url, {
-                waitUntil: 'load',
-                // waitUntil: 'networkidle0'
-                // Remove the timeout
-                timeout: 0
+                waitUntil: 'networkidle2', // Wait until the network is idle
+                timeout: 120000,
             });
 
-            await page.emulateMediaType('screen');
-            const pdf = await page.pdf({
-                path: path,
-                margin: {
-                    top: 40,
-                    bottom: 40,
-                    left: 20,
-                    right: 10
-                },
-                printBackground: true,
+            // Define the custom footer HTML
+            const footer = `
+            <style>
+                #header, #footer {
+                    padding: 0 !important;
+                }
+                .footer {
+                    padding: 0 !important;
+                    margin: 0;
+                    -webkit-print-color-adjust: exact;
+                    background-color: blue;
+                    color: white;
+                    width: 100%;
+                    text-align: right;
+                    font-size: 12px;
+                }
+            </style>
+            <div class="footer">
+                ${url} | Михаил Шардин, https://shardin.name/ <br />
+                Страница <span class="pageNumber"></span> из <span class="totalPages"></span>
+            </div>`;
+
+            // Generate the PDF
+            await page.pdf({
+                path: path, // Output file path
+                format: 'A4', // Paper format
                 displayHeaderFooter: true,
-                footerTemplate: footer,
-                format: 'A4',
+                footerTemplate: footer, // Custom footer HTML
+                margin: {
+                    top: '20mm',
+                    bottom: '20mm',
+                    right: '10mm',
+                    left: '10mm',
+                },
+                printBackground: true, // Include background colors and images
             });
             console.log(`Создан файл ${path.split(/\//).pop()}.\n`)
-            await page.close()
         }
+        // Close the browser
+        await browser.close();
     }
 
-    await browser.close();
     console.log(`Генерация pdf по ссылкам из таблицы ${doc.title} завершена.`)
 
     let currTime = (new Date()).getTime(); //текущее время в формате Unix Time Stamp - Epoch Converter
