@@ -7,12 +7,14 @@
  * @author Mikhail Shardin [Михаил Шардин] 
  * @site https://shardin.name/
  * 
- * Last updated: 25.12.2023
+ * Last updated: 30.08.2024
  * 
  */
 
-function testTinkoff() {
-    var url = 'https://journal.tinkoff.ru/list/i-am-smart/';
+function test_Tinkoff() {
+    // var url = 'https://journal.tinkoff.ru/sposob-perevozki-velosipedov-na-mashine/';
+    // var url = 'https://journal.tinkoff.ru/bond-cash-flow-calc/';
+    var url = 'https://journal.tinkoff.ru/rentier/';
     VCBR = journal_tinkoff_ru(url)
 }
 
@@ -24,14 +26,14 @@ function journal_tinkoff_ru(url) {
         if (index >= 0) {
             var pos = index + searchstring.length
             var articleUUID = html.substring(pos, pos + 36)
-            Logger.log(`articleUUID: https://journal.tinkoff.ru/api/public/v1/potoque/?uuid=${articleUUID}`) // https://social.journal.tinkoff.ru/api/v25/profiles/229963/articles/
+            Logger.log(`articleUUID: https://core.tinkoffjournal.ru/api/public/v2/rpc/articles/get-stats/${articleUUID}`)
         }
-        const response = UrlFetchApp.fetch(`https://journal.tinkoff.ru/api/public/v1/potoque/?uuid=${articleUUID}`)
+        const response = UrlFetchApp.fetch(`https://core.tinkoffjournal.ru/api/public/v2/rpc/articles/get-stats/${articleUUID}`)
         const json = JSON.parse(response.getContentText());
-        let Views = json.data[0].viewsCount
-        let Comments = json.data[0].commentsCount
-        let Bookmarks = json.data[0].favoritesCount
-        let Ratings = json.data[0].likesCount
+        let Views = json.data.views
+        let Comments = json.data.comments
+        let Bookmarks = json.data.favorites
+        let Ratings = json.data.likes
         Logger.log(`Для ${url}:\nПросмотры = ${Views} \nКомментарии = ${Comments} \nЗакладки = ${Bookmarks} \nРейтинг = ${Ratings}.`)
         return `${Views}|${Comments}|${Bookmarks}|${Ratings}`
     } catch (error) {
@@ -39,6 +41,31 @@ function journal_tinkoff_ru(url) {
         return `?|?|?|?`
     }
 }
+
+// БЫЛО до августа 2024:
+// function journal_tinkoff_ru(url) {
+//     try {
+//         var html = UrlFetchApp.fetch(url).getContentText();
+//         var searchstring = 'articleUUID":"'
+//         var index = html.search(searchstring);
+//         if (index >= 0) {
+//             var pos = index + searchstring.length
+//             var articleUUID = html.substring(pos, pos + 36)
+//             Logger.log(`articleUUID: https://journal.tinkoff.ru/api/public/v1/potoque/?uuid=${articleUUID}`) // https://social.journal.tinkoff.ru/api/v25/profiles/229963/articles/
+//         }
+//         const response = UrlFetchApp.fetch(`https://journal.tinkoff.ru/api/public/v1/potoque/?uuid=${articleUUID}`)
+//         const json = JSON.parse(response.getContentText());
+//         let Views = json.data[0].viewsCount
+//         let Comments = json.data[0].commentsCount
+//         let Bookmarks = json.data[0].favoritesCount
+//         let Ratings = json.data[0].likesCount
+//         Logger.log(`Для ${url}:\nПросмотры = ${Views} \nКомментарии = ${Comments} \nЗакладки = ${Bookmarks} \nРейтинг = ${Ratings}.`)
+//         return `${Views}|${Comments}|${Bookmarks}|${Ratings}`
+//     } catch (error) {
+//         Logger.log(`Ошибка чтения данных для ${url}.`)
+//         return `?|?|?|?`
+//     }
+// }
 
 function youtube_com(url) {
     id = url.match(/v=(.*)\&t/)[1]
@@ -62,50 +89,81 @@ function youtube_com(url) {
     }
 }
 
-function testHabr() {
-    var url = 'https://habr.com/ru/articles/777376/';
+function test_Habr() {
+    // var url = 'https://habr.com/ru/articles/825508/';
+    var url = 'https://habr.com/ru/companies/habr/articles/814357/';
     VCBR = habr_com(url)
 }
 
 function habr_com(url) {
     try {
-    var html = UrlFetchApp.fetch(url).getContentText();
-    // Logger.log(`html:\n${html}.`)
-    let Views = +html.match(/<span class=\"tm-icon-counter__value\">(.*?)K<\/span>/)[1]
-        .replace(/\,/g, '.') * 1000
-    // let Comments = `?`// +html.match(/class="tm-comments__comments-count">(.*?)<\/span>/)[1]
-    var searchstringComments = '       Комментарии '
-    var index = html.search(searchstringComments);
-    if (index >= 0) {
-        var pos = index + searchstringComments.length
-        var Comments = html.substring(pos, pos + 70)
-        Comments = +Comments
-            .split('</span>')[0]
-            .replace(/<\/sp/g, '');
-        (!Comments || Comments === undefined) ? Comments = 0: Comments
-    }
+        var html = UrlFetchApp.fetch(url).getContentText();
+        // Logger.log(`html:\n${html}.`)
+        let Views = +html.match(/<span class=\"tm-icon-counter__value\">(.*?)K<\/span>/)[1]
+            .replace(/\,/g, '.') * 1000
+        let Comments = +html.match(/class=\"tm-article-comments-counter-link__value\">(.*?)<\/span>/)[1] //`?`
+        // var searchstringComments = '       Комментарии '
+        // var index = html.search(searchstringComments);
+        // if (index >= 0) {
+        //     var pos = index + searchstringComments.length
+        //     var Comments = html.substring(pos, pos + 70)
+        //     Comments = +Comments
+        //         .split('</span>')[0]
+        //         .replace(/<\/sp/g, '');
+        //     (!Comments || Comments === undefined) ? Comments = 0: Comments
+        // }
 
-    var searchstringBookmarks = 'bookmarks-button__counter'
-    var index = html.search(searchstringBookmarks);
-    if (index >= 0) {
-        var pos = index + searchstringBookmarks.length
-        var Bookmarks = html.substring(pos, pos + 20)
-        Bookmarks = +Bookmarks.match(/\d{1,4}/);
-        (!Bookmarks || Bookmarks === undefined) ? Bookmarks = 0: Bookmarks
-    }
+        var searchstringBookmarks = 'bookmarks-button__counter'
+        var index = html.search(searchstringBookmarks);
+        if (index >= 0) {
+            var pos = index + searchstringBookmarks.length
+            var Bookmarks = html.substring(pos, pos + 90)
+            Bookmarks = +Bookmarks.match(/\d{1,4}/);
+            (!Bookmarks || Bookmarks === undefined) ? Bookmarks = 0: Bookmarks
+        }
 
-    // let Ratings = 0 +html.match(/tm-votes-lever__score-counter tm-votes-lever__score-counter tm-votes-lever__score-counter_positive\">(.*?)<\/span>/)[1]
-    var searchstringRatings = 'tm-votes-lever__score-counter_positive'
-    var index = html.search(searchstringRatings);
-    if (index >= 0) {
-        var pos = index + searchstringRatings.length
-        var Ratings = html.substring(pos, pos + 20)
-        Ratings = +Ratings.match(/\d{1,4}/);
-        (!Ratings || Ratings === undefined) ? Ratings = 0: Ratings
-    }
+        // let Ratings = +html.match(/\">(\+?\d+)<\/span><\/div><\/div><\!\-\-teleport start\-\-><\!\-\-teleport end\-\-\>/)[1]
+        var searchstringRatings = 'Всего голосов'
+        var index = html.search(searchstringRatings);
+        if (index >= 0) {
+            var pos = index + searchstringRatings.length
+            var Ratings = html.substring(pos, pos + 700)
+            // Logger.log(`Ratings:\n${Ratings}.`)
+            Ratings = +Ratings.match(/\+\d{1,4}/);
+            (!Ratings || Ratings === undefined) ? Ratings = 0: Ratings
+        }
 
-    Logger.log(`Для ${url}:\nПросмотры = ${Views} \nКомментарии = ${Comments} \nЗакладки = ${Bookmarks} \nРейтинг = ${Ratings}.`)
-    return `${Views}|${Comments}|${Bookmarks}|${Ratings}`
+        Logger.log(`Для ${url}:\nПросмотры = ${Views} \nКомментарии = ${Comments} \nЗакладки = ${Bookmarks} \nРейтинг = ${Ratings}.`)
+        return `${Views}|${Comments}|${Bookmarks}|${Ratings}`
+    } catch (error) {
+        Logger.log(`Ошибка чтения данных для ${url}.`)
+        return `?|?|?|?`
+    }
+}
+
+function test_Pikabu() {
+    var url = 'https://pikabu.ru/story/kak_ya_nashyol_prevoskhodnyiy_no_dorogoy_sposob_perevozki_velosipedov_v_avtomobile_11759297';
+    VCBR = pikabu_ru(url)
+}
+
+function pikabu_ru(url) {
+    try {
+        // Extract the number from the original link
+        const storyId = url.match(/(\d+)$/)[0];
+
+        // Construct the API URL using the extracted storyId
+        const apiUrl = `https://d.pikabu.ru/counters/story/${storyId}`;
+
+        // Fetch the JSON response from the API
+        const response = UrlFetchApp.fetch(apiUrl);
+        const json = JSON.parse(response.getContentText());
+
+        let Views = json.data.v
+        let Comments = 0
+        let Bookmarks = 0
+        let Ratings = 0
+        Logger.log(`Для ${url}:\nПросмотры = ${Views} \nКомментарии = ${Comments} \nЗакладки = ${Bookmarks} \nРейтинг = ${Ratings}.`)
+        return `${Views}|${Comments}|${Bookmarks}|${Ratings}`
     } catch (error) {
         Logger.log(`Ошибка чтения данных для ${url}.`)
         return `?|?|?|?`
@@ -130,7 +188,7 @@ function github_com(url) {
     }
 }
 
-function testTG() {
+function test_TG() {
     var url = 'https://t.me/google_sheets/464';
     VCBR = t_me(url)
 }
@@ -172,7 +230,7 @@ function d3today_ru(url) {
     }
 }
 
-function testVC() {
+function test_VC() {
     var url = 'https://vc.ru/finance/92990-upravlencheskiy-uchet-lichnyh-aktivov';
     VCBR = vc_ru(url)
 }
