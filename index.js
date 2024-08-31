@@ -11,7 +11,7 @@
  * @author Mikhail Shardin [Михаил Шардин] 
  * @site https://shardin.name/
  * 
- * Last updated: 02.05.2024
+ * Last updated: 31.08.2024
  * 
  */
 
@@ -90,7 +90,10 @@ const {
     console.log(`Генерация списка публикаций с листа ${sheet1.title}.\n`)
     Topics = []
     for (var i = 2; i <= rows1.length + 1; i++) {
-        Topics.push(sheet1.getCellByA1('F' + i).value)
+        // Check if the value is not null, undefined, or empty
+        if (sheet1.getCellByA1('F' + i).value) {
+            Topics.push(sheet1.getCellByA1('F' + i).value)
+        }
     }
     TopicsUnique = Topics.filter((v, i, a) => a.indexOf(v) === i);
     console.log(`Уникальные значения тем: ${JSON.stringify(TopicsUnique)}.\n`)
@@ -108,25 +111,54 @@ const {
     </ul>
     </small>\n`
 
-    // дальше уже разбирает по темам
+    // дальше уже разбирам по темам
     for (var t = 0; t <= TopicsUnique.length; t++) {
         publications += `<h5 style="margin-top: 8px;">По теме «${TopicsUnique[t]}»:</h5>\n`
         for (var i = 2; i <= rows1.length + 1; i++) {
-            if (sheet1.getCellByA1('D' + i).formattedValue != null) {
-                console.log(`Строка ${i}: ${sheet1.getCellByA1('A' + i).formattedValue} для ${TopicsUnique[t]}.`)
+            // проверяем что есть ссылка на публикацию и это НЕ перепубликация, а оригинал
+            if (sheet1.getCellByA1('D' + i).formattedValue != null && sheet1.getCellByA1('L' + i).formattedValue == null) {
+                // console.log(`Строка ${i}: ${sheet1.getCellByA1('A' + i).formattedValue} для ${TopicsUnique[t]}.`)
                 var textArray = sheet1.getCellByA1('C' + i).formattedValue.split("-")
                 date = textArray[2] + '.' + textArray[1] + '.' + textArray[0] //переделываем дату из 2018-05-17 в 17.05.2018
                 var type = sheet1.getCellByA1('B' + i).value
-                if (TopicsUnique[t] == sheet1.getCellByA1('F' + i).value && type == 'Веб' && sheet1.getCellByA1('D' + i).value != null) {
-                    var url = sheet1.getCellByA1('D' + i).value
+
+                // Формируем сайты, сгруппированные по темам
+                if (TopicsUnique[t] == sheet1.getCellByA1('F' + i).value && type == 'Веб' && sheet1.getCellByA1('D' + i).value != null) {                    
+                    console.log(`[${TopicsUnique[t]}], строка ${i}: ${sheet1.getCellByA1('A' + i).formattedValue}.`)
+                    var url = sheet1.getCellByA1('D' + i).value;
                     var path = `./articles/${sheet1.getCellByA1('C' + i).formattedValue}_${url.split(/\/\//)[1].split(/\//)[0].replace(/\./g, '-')}_${sheet1.getCellByA1('F' + i).formattedValue}.pdf`
-                    publications += `<li>${sheet1.getCellByA1('E' + i).formattedValue}. <a target="_blank" rel="noopener noreferrer" href="${sheet1.getCellByA1('D' + i).formattedValue}">${sheet1.getCellByA1('A' + i).formattedValue}</a> [<a target="_blank" rel="noopener noreferrer" title="Сохраненная копия статьи от ${moment().format('DD.MM.YYYY')}" href="${path}">💾</a>] от ${date}.</li>\n`
+
+                    // Инициализируем запись публикации
+                    var publicationEntry = `<li>${sheet1.getCellByA1('E' + i).formattedValue}. <a target="_blank" rel="noopener noreferrer" href="${sheet1.getCellByA1('D' + i).formattedValue}">${sheet1.getCellByA1('A' + i).formattedValue}</a> [<a target="_blank" rel="noopener noreferrer" title="Сохраненная копия статьи от ${moment().format('DD.MM.YYYY')}" href="${path}">💾</a>] от ${date}`
+
+                    // Проверка наличия републикации
+                    var isRepublication = false;
+                    for (var q = 2; q <= rows1.length + 1; q++) {
+                        if (sheet1.getCellByA1('L' + q).formattedValue == sheet1.getCellByA1('D' + i).formattedValue) {                            
+                            console.log(`Совпадение: ${sheet1.getCellByA1('L' + q).formattedValue} и ${sheet1.getCellByA1('D' + i).formattedValue}.`);
+                            isRepublication = true;
+                            break;
+                        } else {
+                            // console.log(`НЕ совпало: ${sheet1.getCellByA1('L' + q).formattedValue} и ${sheet1.getCellByA1('D' + i).formattedValue}.`);
+                        }
+                    }
+
+                    // Добавление окончания строки после проверки перепубликации
+                    if (isRepublication) {
+                        publicationEntry += ` и перепубликации.</li>\n`;
+                    } else {
+                        publicationEntry += `.</li>\n`;
+                    }
+
+                    publications += publicationEntry;
                 }
 
+                // Формируем печатные издания
                 if (TopicsUnique[t] == sheet1.getCellByA1('F' + i).value && type != 'Веб' && type != 'Видео' && sheet1.getCellByA1('D' + i).value != null) {
                     publications += `<li>${sheet1.getCellByA1('E' + i).formattedValue}. ${sheet1.getCellByA1('A' + i).formattedValue} в ${sheet1.getCellByA1('D' + i).formattedValue.replace(/\[/gm, '').replace(/\]/gm, '')} от ${date}.</li>\n`
                 }
 
+                // Формируем видео
                 if (TopicsUnique[t] == sheet1.getCellByA1('F' + i).value && type == 'Видео' && sheet1.getCellByA1('D' + i).value != null) {
                     publications += `<li><a target="_blank" rel="noopener noreferrer" href="${sheet1.getCellByA1('D' + i).formattedValue}">${sheet1.getCellByA1('A' + i).formattedValue}</a> от ${date}.</li>\n`
                 }
