@@ -49,8 +49,8 @@ const {
             Resources.push([
                 'Публикации',
                 `${sheet4.getCell(i, 0).formattedValue}: ${sheet4.getCell(i, 1).value} шт.`,
-                `new Date(${datefrom.split("-")[0]}, ${datefrom.split("-")[1]-1})`,
-                `new Date(${dateto.split("-")[0]}, ${dateto.split("-")[1]})` // -1 если без прибавления одного месяца
+                `new Date(${datefrom.split("-")[0]}, ${+datefrom.split("-")[1]-1})`,
+                `new Date(${dateto.split("-")[0]}, ${+dateto.split("-")[1]})` // -1 если без прибавления одного месяца
             ])
         }
     }
@@ -101,15 +101,18 @@ const {
     var publications = '<!-- Начало вставки из сгенерированного файла piece_publications -->\n<ol>\n'
 
     // подгружает статистику публикаций
-    publications += `Ниже Вы можете бесплатно скачать любую из моих опубликованных статей. Для этого нажмите на значок 💾
-    справа от названия материала. Также Вы можете принять участие в обсуждении интересных Вам тем, просто
-    перейдя по ссылке - комментарии есть у всех статей.<br>\n
+    publications += `<p>Подпишитесь через <a target="_blank" rel="noopener noreferrer" href="https://t.me/mshardin_bot">моего
+                        телеграм бота 🤖</a> на уведомления о выходе новых статей. Уведомления без спама.<br><br>
+                    Прямо сейчас можно бесплатно скачать любую из опубликованных статей. Для этого нажмите на
+                    значок 💾 справа от названия материала. А ещё можно обсудить любую интересную тему в комментариях -
+                    просто перейдя по ссылке названия статьи.</p>\n
     <small class="text-muted">${sheet6.getCellByA1('A1').formattedValue}<br>
     <ul>
         <li>${sheet6.getCellByA1('A3').formattedValue}</li>
         <li>${sheet6.getCellByA1('A4').formattedValue}</li>
     </ul>
-    </small>\n`
+    </small></p>\n
+    <p>Если Вам помогли мои статьи, то можно <a target="_blank" rel="noopener noreferrer" href="https://www.tbank.ru/rm/shardin.mikhail1/0dKi144262/">поддержать автора с помощью доната 💸</a>.</p>`
 
     // дальше уже разбирам по темам
     for (var t = 0; t <= TopicsUnique.length; t++) {
@@ -123,7 +126,7 @@ const {
                 var type = sheet1.getCellByA1('B' + i).value
 
                 // Формируем сайты, сгруппированные по темам
-                if (TopicsUnique[t] == sheet1.getCellByA1('F' + i).value && type == 'Веб' && sheet1.getCellByA1('D' + i).value != null) {                    
+                if (TopicsUnique[t] == sheet1.getCellByA1('F' + i).value && type == 'Веб' && sheet1.getCellByA1('D' + i).value != null) {
                     console.log(`[${TopicsUnique[t]}], строка ${i}: ${sheet1.getCellByA1('A' + i).formattedValue}.`)
                     var url = sheet1.getCellByA1('D' + i).value;
                     var path = `./articles/${sheet1.getCellByA1('C' + i).formattedValue}_${url.split(/\/\//)[1].split(/\//)[0].replace(/\./g, '-')}_${sheet1.getCellByA1('F' + i).formattedValue}.pdf`
@@ -134,7 +137,7 @@ const {
                     // Проверка наличия републикации
                     var isRepublication = false;
                     for (var q = 2; q <= rows1.length + 1; q++) {
-                        if (sheet1.getCellByA1('L' + q).formattedValue == sheet1.getCellByA1('D' + i).formattedValue) {                            
+                        if (sheet1.getCellByA1('L' + q).formattedValue == sheet1.getCellByA1('D' + i).formattedValue) {
                             console.log(`Совпадение: ${sheet1.getCellByA1('L' + q).formattedValue} и ${sheet1.getCellByA1('D' + i).formattedValue}.`);
                             isRepublication = true;
                             break;
