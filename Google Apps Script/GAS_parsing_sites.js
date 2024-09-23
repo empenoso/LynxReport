@@ -7,7 +7,7 @@
  * @author Mikhail Shardin [Михаил Шардин] 
  * @site https://shardin.name/
  * 
- * Last updated: 30.08.2024
+ * Last updated: 23.09.2024
  * 
  */
 
@@ -67,6 +67,8 @@ function journal_tinkoff_ru(url) {
 //     }
 // }
 
+// =================================================================
+
 function youtube_com(url) {
     id = url.match(/v=(.*)\&t/)[1]
     Logger.log(`URL: ${url}.\nid: ${id}.`)
@@ -88,6 +90,8 @@ function youtube_com(url) {
         return `?|?|?|?`
     }
 }
+
+// =================================================================
 
 function test_Habr() {
     // var url = 'https://habr.com/ru/articles/825508/';
@@ -141,34 +145,98 @@ function habr_com(url) {
     }
 }
 
+// =================================================================
+
 function test_Pikabu() {
-    var url = 'https://pikabu.ru/story/kak_ya_nashyol_prevoskhodnyiy_no_dorogoy_sposob_perevozki_velosipedov_v_avtomobile_11759297';
+    var url = 'https://pikabu.ru/story/kak_ya_pri_pomoshchi_dvukh_skriptov_smog_avtomaticheski_sgenerirovat_opis_dokumentov_dlya_700_stranits_11812093';
     VCBR = pikabu_ru(url)
 }
 
-function pikabu_ru(url) {
+function pikabu_ru(url) { 
     try {
         // Extract the number from the original link
         const storyId = url.match(/(\d+)$/)[0];
-
         // Construct the API URL using the extracted storyId
         const apiUrl = `https://d.pikabu.ru/counters/story/${storyId}`;
-
+        Logger.log(`Служебный API: ${apiUrl}.`);
         // Fetch the JSON response from the API
         const response = UrlFetchApp.fetch(apiUrl);
         const json = JSON.parse(response.getContentText());
-
-        let Views = json.data.v
-        let Comments = 0
-        let Bookmarks = 0
-        let Ratings = 0
-        Logger.log(`Для ${url}:\nПросмотры = ${Views} \nКомментарии = ${Comments} \nЗакладки = ${Bookmarks} \nРейтинг = ${Ratings}.`)
-        return `${Views}|${Comments}|${Bookmarks}|${Ratings}`
+        var html = UrlFetchApp.fetch(url).getContentText();
+        let Views = json.data.v || 0;        
+        let Comments = (html.match(/<span class="story__comments-link-count">(\d+)<\/span>/) || [0, 0])[1];        
+        let Bookmarks = "?" //(html.match(/\, сохранений \- (\d+)\./) || [0, 0])[1];
+        let Ratings = (html.match(/<div class="story__rating-count">(\d+)<\/div>/) || [0, 0])[1];        
+        Logger.log(`Для ${url}:\nПросмотры = ${Views} \nКомментарии = ${Comments} \nЗакладки = ${Bookmarks} \nРейтинг = ${Ratings}.`);
+        return `${Views}|${Comments}|${Bookmarks}|${Ratings}`;
     } catch (error) {
-        Logger.log(`Ошибка чтения данных для ${url}.`)
-        return `?|?|?|?`
+        Logger.log(`Ошибка чтения данных для ${url}: ${error}`);
+        return `?|?|?|?`;
     }
 }
+
+// =================================================================
+
+function test_smart_lab_ru() {
+    var url = 'https://smart-lab.ru/mobile/topic/1055572/';
+    VCBR = smart_lab_ru(url)
+}
+
+function smart_lab_ru(url) {
+    try {
+        // Извлечение идентификатора темы из URL
+        const topicId = url.match(/topic\/(\d+)/)[1];
+
+        // Получение текущего времени в формате Unix (в миллисекундах)
+        const timestamp = Date.now();
+
+        // Формирование API URL с topicId и текущим Unix timestamp
+        const apiUrl = `https://smart-lab.ru/cgi-bin/gcn.fcgi?list=${topicId}&func=func8422&_=${timestamp}`;
+        Logger.log(`Служебный API: ${apiUrl}.`);
+
+        // Установка пользовательского заголовка User-Agent, чтобы запрос выглядел как от Chrome на Windows
+        const options = {
+            'headers': {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+            },
+            'muteHttpExceptions': true // Разрешает обработку кодов состояния HTTP, отличных от 200
+        };
+
+        // Получение текстового ответа от API с указанными параметрами
+        const response = UrlFetchApp.fetch(apiUrl, options).getContentText();
+        Logger.log(`Ответ API: ${response}.`);
+
+        // Проверка, что ответ не пуст
+        if (!response) {
+            throw new Error("Пустой ответ от сервера.");
+        }
+
+        // Ответ имеет формат: func8422(1055572,1787);
+        // Извлечение просмотров путем разделения строки по символам
+        let startIndex = response.indexOf('(') + 1;
+        let endIndex = response.indexOf(')');
+        let numbers = response.substring(startIndex, endIndex).split(',');
+
+        // Первый номер — это topicId, а второй — это количество просмотров
+        let Views = numbers[1] ? parseInt(numbers[1].trim()) : 0;
+
+        // Заполнение комментариев, закладок и рейтинга вопросительными знаками
+        let Comments = "?";
+        let Bookmarks = "?";
+        let Ratings = "?";
+
+        // Логирование и возврат значений
+        Logger.log(`Для ${url}:\nПросмотры = ${Views} \nКомментарии = ${Comments} \nЗакладки = ${Bookmarks} \nРейтинг = ${Ratings}.`);
+        return `${Views}|${Comments}|${Bookmarks}|${Ratings}`;
+    } catch (error) {
+        // Обработка ошибок
+        Logger.log(`Ошибка чтения данных для ${url}: ${error}`);
+        return `?|?|?|?`;
+    }
+}
+
+
+// =================================================================
 
 function github_com(url) {
     urlReplace = url + "/stargazers"
@@ -188,31 +256,41 @@ function github_com(url) {
     }
 }
 
-function test_TG() {
-    var url = 'https://t.me/google_sheets/464';
+// =================================================================
+
+function test_Tg() {
+    // var url = 'https://t.me/google_sheets/464';
+    var url = 'https://t.me/gasru/495';
     VCBR = t_me(url)
 }
 
 function t_me(url) {
-    // try {
-    urlReplace = url
-        .replace(/t\.me/g, 'tgstat.ru/channel/@')
-        .replace(/\/\@\//g, '/@')
-    Logger.log(`Старый адрес: ${url}.\nНовый адрес: ${urlReplace}.`)
-
-    var html = UrlFetchApp.fetch(urlReplace).getContentText();
-    Views = +html.match(/<i class=\"uil-eye\"><\/i>(.*?)k/)[1] * 1000
-    Comments = '-' // +html.match(/<i class=\"uil-comments-alt\"><\/i>(.*?)                    <\/span>/)[1]
-    Bookmarks = '-'
-    Ratings = +html.match(/<i class=\"uil-share-alt\"><\/i>(.*?)                <\/a>/)[1]
-
-    Logger.log(`Для ${url}:\nПросмотры = ${Views} \nКомментарии = ${Comments} \nЗакладки = ${Bookmarks} \nРейтинг = ${Ratings}.`)
-    return `${Views}|${Comments}|${Bookmarks}|${Ratings}`
-    // } catch (error) {
-    //     Logger.log(`Ошибка чтения данных для ${url}.`)
-    //     return `?|?|?|?`
-    // }
+    try {
+        urlReplace = url
+            .replace(/t\.me/g, 'tgstat.ru/channel/@')
+            .replace(/\/\@\//g, '/@');
+        Logger.log(`Старый адрес: ${url}.\nНовый адрес: ${urlReplace}.`);
+        var html = UrlFetchApp.fetch(urlReplace).getContentText();
+        // Парсинг количества просмотров
+        var viewsMatch = html.match(/<i class=\"uil-eye\"><\/i>([0-9,.]+)(k?)/);
+        var Views = 0;
+        if (viewsMatch) {
+            Views = parseFloat(viewsMatch[1].replace(',', '.')) * (viewsMatch[2] === 'k' ? 1000 : 1);
+        }
+        var commentsMatch = html.match(/<i class="uil-comments-alt"><\/i>(\d+)/);
+        var Comments = commentsMatch ? parseInt(commentsMatch[1]) : '-';
+        var Bookmarks = '-';
+        var ratingsMatch = html.match(/<i class=\"uil-share-alt\"><\/i>([0-9,]+)/);
+        var Ratings = ratingsMatch ? parseInt(ratingsMatch[1].replace(',', '')) : 0;
+        Logger.log(`Для ${url}:\nПросмотры = ${Views} \nКомментарии = ${Comments} \nЗакладки = ${Bookmarks} \nРейтинг = ${Ratings}.`);
+        return `${Views}|${Comments}|${Bookmarks}|${Ratings}`;
+    } catch (error) {
+        Logger.log(`Ошибка чтения данных для ${url}.`)
+        return `?|?|?|?`
+    }
 }
+
+// =================================================================
 
 function d3today_ru(url) {
     try {
@@ -230,17 +308,19 @@ function d3today_ru(url) {
     }
 }
 
+// =================================================================
+
 function test_VC() {
-    var url = 'https://vc.ru/finance/92990-upravlencheskiy-uchet-lichnyh-aktivov';
+    var url = 'https://vc.ru/office/1478158-kak-ya-pri-pomoshi-dvuh-skriptov-smog-avtomaticheski-sgenerirovat-opis-dokumentov-dlya-700-stranic';
     VCBR = vc_ru(url)
 }
 
 function vc_ru(url) {
     try {
         var html = UrlFetchApp.fetch(url).getContentText();
-        Views = +html.match(/<span class=\"views__value\">(.*?)<\/span>/)[1]
-        Comments = '-' // +html.match(/<span class="comments_counter__count__value">(.*?)<\/span>/)[1]
-        Bookmarks = '-'
+        Views = +html.match(/class=\"content-views__counter\">(\d+)<\/div>/)[1]
+        Comments = +html.match(/class=\"comments-counter__label\">(\d+) <\!/)[1]
+        Bookmarks = +html.match(/class=\"bookmark-button__label\">(\d+)</)[1]
         Ratings = '-' //+html.match(/<span class="vote__value__v vote__value__v--real">(.*?)<\/span>/)[1]
 
         Logger.log(`Для ${url}:\nПросмотры = ${Views} \nКомментарии = ${Comments} \nЗакладки = ${Bookmarks} \nРейтинг = ${Ratings}.`)
