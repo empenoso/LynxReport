@@ -11,162 +11,127 @@
  * 
  */
 
+// Функция для тестирования запроса на Tinkoff Journal
 function test_Tinkoff() {
-    // var url = 'https://journal.tinkoff.ru/sposob-perevozki-velosipedov-na-mashine/';
-    // var url = 'https://journal.tinkoff.ru/bond-cash-flow-calc/';
     var url = 'https://journal.tinkoff.ru/rentier/';
-    VCBR = journal_tinkoff_ru(url)
+    VCBR = journal_tinkoff_ru(url);
 }
 
+// Функция для получения статистики статьи из Tinkoff Journal
 function journal_tinkoff_ru(url) {
     try {
         var html = UrlFetchApp.fetch(url).getContentText();
-        var searchstring = 'articleUUID":"'
+        var searchstring = 'articleUUID":"';
         var index = html.search(searchstring);
         if (index >= 0) {
-            var pos = index + searchstring.length
-            var articleUUID = html.substring(pos, pos + 36)
-            Logger.log(`articleUUID: https://core.tinkoffjournal.ru/api/public/v2/rpc/articles/get-stats/${articleUUID}`)
+            var pos = index + searchstring.length;
+            var articleUUID = html.substring(pos, pos + 36);
+            Logger.log(`articleUUID: https://core.tinkoffjournal.ru/api/public/v2/rpc/articles/get-stats/${articleUUID}`);
         }
-        const response = UrlFetchApp.fetch(`https://core.tinkoffjournal.ru/api/public/v2/rpc/articles/get-stats/${articleUUID}`)
+        const response = UrlFetchApp.fetch(`https://core.tinkoffjournal.ru/api/public/v2/rpc/articles/get-stats/${articleUUID}`);
         const json = JSON.parse(response.getContentText());
-        let Views = json.data.views
-        let Comments = json.data.comments
-        let Bookmarks = json.data.favorites
-        let Ratings = json.data.likes
-        Logger.log(`Для ${url}:\nПросмотры = ${Views} \nКомментарии = ${Comments} \nЗакладки = ${Bookmarks} \nРейтинг = ${Ratings}.`)
-        return `${Views}|${Comments}|${Bookmarks}|${Ratings}`
+        let Views = json.data.views;
+        let Comments = json.data.comments;
+        let Bookmarks = json.data.favorites;
+        let Ratings = json.data.likes;
+        Logger.log(`Для ${url}:\nПросмотры = ${Views} \nКомментарии = ${Comments} \nЗакладки = ${Bookmarks} \nРейтинг = ${Ratings}.`);
+        return `${Views}|${Comments}|${Bookmarks}|${Ratings}`;
     } catch (error) {
-        Logger.log(`Ошибка чтения данных для ${url}.`)
-        return `?|?|?|?`
+        Logger.log(`Ошибка чтения данных для ${url}.`);
+        return `?|?|?|?`;
     }
 }
 
-// БЫЛО до августа 2024:
-// function journal_tinkoff_ru(url) {
-//     try {
-//         var html = UrlFetchApp.fetch(url).getContentText();
-//         var searchstring = 'articleUUID":"'
-//         var index = html.search(searchstring);
-//         if (index >= 0) {
-//             var pos = index + searchstring.length
-//             var articleUUID = html.substring(pos, pos + 36)
-//             Logger.log(`articleUUID: https://journal.tinkoff.ru/api/public/v1/potoque/?uuid=${articleUUID}`) // https://social.journal.tinkoff.ru/api/v25/profiles/229963/articles/
-//         }
-//         const response = UrlFetchApp.fetch(`https://journal.tinkoff.ru/api/public/v1/potoque/?uuid=${articleUUID}`)
-//         const json = JSON.parse(response.getContentText());
-//         let Views = json.data[0].viewsCount
-//         let Comments = json.data[0].commentsCount
-//         let Bookmarks = json.data[0].favoritesCount
-//         let Ratings = json.data[0].likesCount
-//         Logger.log(`Для ${url}:\nПросмотры = ${Views} \nКомментарии = ${Comments} \nЗакладки = ${Bookmarks} \nРейтинг = ${Ratings}.`)
-//         return `${Views}|${Comments}|${Bookmarks}|${Ratings}`
-//     } catch (error) {
-//         Logger.log(`Ошибка чтения данных для ${url}.`)
-//         return `?|?|?|?`
-//     }
-// }
-
 // =================================================================
 
+// Функция для получения статистики видео с YouTube
 function youtube_com(url) {
-    id = url.match(/v=(.*)\&t/)[1]
-    Logger.log(`URL: ${url}.\nid: ${id}.`)
+    id = url.match(/v=(.*)\&t/)[1];
+    Logger.log(`URL: ${url}.\nid: ${id}.`);
     try {
         let item = YouTube.Videos.list('snippet,statistics', {
             'id': id
-        }).items[0]
-        let stat = item.statistics
-        let snippet = item.snippet
-        Views = stat.viewCount
-        Comments = '-'
-        Bookmarks = '-'
-        Ratings = "+" + stat.likeCount //+ " / -?" //+ stat.dislikeCount
+        }).items[0];
+        let stat = item.statistics;
+        Views = stat.viewCount;
+        Comments = '-';
+        Bookmarks = '-';
+        Ratings = "+" + stat.likeCount;
 
-        Logger.log(`Для ${url}:\nПросмотры = ${Views} \nКомментарии = ${Comments} \nЗакладки = ${Bookmarks} \nРейтинг = ${Ratings}.`)
-        return `${Views}|${Comments}|${Bookmarks}|${Ratings}`
+        Logger.log(`Для ${url}:\nПросмотры = ${Views} \nКомментарии = ${Comments} \nЗакладки = ${Bookmarks} \nРейтинг = ${Ratings}.`);
+        return `${Views}|${Comments}|${Bookmarks}|${Ratings}`;
     } catch (error) {
-        Logger.log(`Ошибка чтения данных для ${url}.`)
-        return `?|?|?|?`
+        Logger.log(`Ошибка чтения данных для ${url}.`);
+        return `?|?|?|?`;
     }
 }
 
 // =================================================================
 
+// Функция для тестирования запроса на Habr
 function test_Habr() {
-    // var url = 'https://habr.com/ru/articles/825508/';
     var url = 'https://habr.com/ru/companies/habr/articles/814357/';
-    VCBR = habr_com(url)
+    VCBR = habr_com(url);
 }
 
+// Функция для получения статистики статьи с Habr
 function habr_com(url) {
     try {
         var html = UrlFetchApp.fetch(url).getContentText();
-        // Logger.log(`html:\n${html}.`)
         let Views = +html.match(/<span class=\"tm-icon-counter__value\">(.*?)K<\/span>/)[1]
-            .replace(/\,/g, '.') * 1000
-        let Comments = +html.match(/class=\"tm-article-comments-counter-link__value\">(.*?)<\/span>/)[1] //`?`
-        // var searchstringComments = '       Комментарии '
-        // var index = html.search(searchstringComments);
-        // if (index >= 0) {
-        //     var pos = index + searchstringComments.length
-        //     var Comments = html.substring(pos, pos + 70)
-        //     Comments = +Comments
-        //         .split('</span>')[0]
-        //         .replace(/<\/sp/g, '');
-        //     (!Comments || Comments === undefined) ? Comments = 0: Comments
-        // }
+            .replace(/\,/g, '.') * 1000;
+        let Comments = +html.match(/class=\"tm-article-comments-counter-link__value\">(.*?)<\/span>/)[1];
 
-        var searchstringBookmarks = 'bookmarks-button__counter'
+        var searchstringBookmarks = 'bookmarks-button__counter';
         var index = html.search(searchstringBookmarks);
         if (index >= 0) {
-            var pos = index + searchstringBookmarks.length
-            var Bookmarks = html.substring(pos, pos + 90)
+            var pos = index + searchstringBookmarks.length;
+            var Bookmarks = html.substring(pos, pos + 90);
             Bookmarks = +Bookmarks.match(/\d{1,4}/);
-            (!Bookmarks || Bookmarks === undefined) ? Bookmarks = 0: Bookmarks
+            (!Bookmarks || Bookmarks === undefined) ? Bookmarks = 0: Bookmarks;
         }
 
-        // let Ratings = +html.match(/\">(\+?\d+)<\/span><\/div><\/div><\!\-\-teleport start\-\-><\!\-\-teleport end\-\-\>/)[1]
-        var searchstringRatings = 'Всего голосов'
+        var searchstringRatings = 'Всего голосов';
         var index = html.search(searchstringRatings);
         if (index >= 0) {
-            var pos = index + searchstringRatings.length
-            var Ratings = html.substring(pos, pos + 700)
-            // Logger.log(`Ratings:\n${Ratings}.`)
+            var pos = index + searchstringRatings.length;
+            var Ratings = html.substring(pos, pos + 700);
             Ratings = +Ratings.match(/\+\d{1,4}/);
-            (!Ratings || Ratings === undefined) ? Ratings = 0: Ratings
+            (!Ratings || Ratings === undefined) ? Ratings = 0: Ratings;
         }
 
-        Logger.log(`Для ${url}:\nПросмотры = ${Views} \nКомментарии = ${Comments} \nЗакладки = ${Bookmarks} \nРейтинг = ${Ratings}.`)
-        return `${Views}|${Comments}|${Bookmarks}|${Ratings}`
+        Logger.log(`Для ${url}:\nПросмотры = ${Views} \nКомментарии = ${Comments} \nЗакладки = ${Bookmarks} \nРейтинг = ${Ratings}.`);
+        return `${Views}|${Comments}|${Bookmarks}|${Ratings}`;
     } catch (error) {
-        Logger.log(`Ошибка чтения данных для ${url}.`)
-        return `?|?|?|?`
+        Logger.log(`Ошибка чтения данных для ${url}.`);
+        return `?|?|?|?`;
     }
 }
 
 // =================================================================
 
+// Функция для тестирования запроса на Pikabu
 function test_Pikabu() {
     var url = 'https://pikabu.ru/story/kak_ya_pri_pomoshchi_dvukh_skriptov_smog_avtomaticheski_sgenerirovat_opis_dokumentov_dlya_700_stranits_11812093';
-    VCBR = pikabu_ru(url)
+    VCBR = pikabu_ru(url);
 }
 
-function pikabu_ru(url) { 
+// Функция для получения статистики статьи с Pikabu
+function pikabu_ru(url) {
     try {
-        // Extract the number from the original link
+        // Извлечение идентификатора истории из URL
         const storyId = url.match(/(\d+)$/)[0];
-        // Construct the API URL using the extracted storyId
+        // Формирование API URL с использованием извлеченного storyId
         const apiUrl = `https://d.pikabu.ru/counters/story/${storyId}`;
         Logger.log(`Служебный API: ${apiUrl}.`);
-        // Fetch the JSON response from the API
+        // Получение JSON ответа от API
         const response = UrlFetchApp.fetch(apiUrl);
         const json = JSON.parse(response.getContentText());
         var html = UrlFetchApp.fetch(url).getContentText();
-        let Views = json.data.v || 0;        
-        let Comments = (html.match(/<span class="story__comments-link-count">(\d+)<\/span>/) || [0, 0])[1];        
-        let Bookmarks = "?" //(html.match(/\, сохранений \- (\d+)\./) || [0, 0])[1];
-        let Ratings = (html.match(/<div class="story__rating-count">(\d+)<\/div>/) || [0, 0])[1];        
+        let Views = json.data.v || 0;
+        let Comments = (html.match(/<span class="story__comments-link-count">(\d+)<\/span>/) || [0, 0])[1];
+        let Bookmarks = "?";
+        let Ratings = (html.match(/<div class="story__rating-count">(\d+)<\/div>/) || [0, 0])[1];
         Logger.log(`Для ${url}:\nПросмотры = ${Views} \nКомментарии = ${Comments} \nЗакладки = ${Bookmarks} \nРейтинг = ${Ratings}.`);
         return `${Views}|${Comments}|${Bookmarks}|${Ratings}`;
     } catch (error) {
@@ -177,11 +142,13 @@ function pikabu_ru(url) {
 
 // =================================================================
 
+// Функция для тестирования запроса на Smart Lab
 function test_smart_lab_ru() {
     var url = 'https://smart-lab.ru/mobile/topic/1055572/';
-    VCBR = smart_lab_ru(url)
+    VCBR = smart_lab_ru(url);
 }
 
+// Функция для получения статистики темы с Smart Lab
 function smart_lab_ru(url) {
     try {
         // Извлечение идентификатора темы из URL
@@ -229,12 +196,10 @@ function smart_lab_ru(url) {
         Logger.log(`Для ${url}:\nПросмотры = ${Views} \nКомментарии = ${Comments} \nЗакладки = ${Bookmarks} \nРейтинг = ${Ratings}.`);
         return `${Views}|${Comments}|${Bookmarks}|${Ratings}`;
     } catch (error) {
-        // Обработка ошибок
         Logger.log(`Ошибка чтения данных для ${url}: ${error}`);
         return `?|?|?|?`;
     }
 }
-
 
 // =================================================================
 
