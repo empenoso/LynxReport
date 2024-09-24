@@ -7,7 +7,7 @@
  * @author Mikhail Shardin [Михаил Шардин] 
  * @site https://shardin.name/
  * 
- * Last updated: 30.08.2024
+ * Last updated: 24.09.2024
  * 
  */
 
@@ -54,6 +54,14 @@ function UpdatingArticleViewsCommentsBookmarksRatings() {
                 ])
             } else if (domainName == 'https://pikabu.ru') {
                 VCBR = pikabu_ru(url)
+                ViewsCommentsBookmarksRatings.push([
+                    VCBR.split('|')[0],
+                    VCBR.split('|')[1],
+                    VCBR.split('|')[2],
+                    VCBR.split('|')[3]
+                ])
+            } else if (domainName == 'https://smart-lab.ru') {
+                VCBR = smart_lab_ru(url)
                 ViewsCommentsBookmarksRatings.push([
                     VCBR.split('|')[0],
                     VCBR.split('|')[1],
