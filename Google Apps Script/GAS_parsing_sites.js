@@ -70,7 +70,7 @@ function youtube_com(url) {
 
 // Функция для тестирования запроса на Habr
 function test_Habr() {
-    var url = 'https://habr.com/ru/articles/857402/';
+    var url = 'https://habr.com/ru/articles/855742/';
     VCBR = habr_com(url);
 }
 
@@ -87,18 +87,19 @@ function habr_com(url) {
         if (index >= 0) {
             var pos = index + searchstringBookmarks.length;
             var Bookmarks = html.substring(pos, pos + 90);
-            Bookmarks = +Bookmarks.match(/\d{1,4}/);
-            (!Bookmarks || Bookmarks === undefined) ? Bookmarks = 0: Bookmarks;
+            Bookmarks = +Bookmarks.match(/\d{1,4}/);            
         }
+        (!Bookmarks || Bookmarks === undefined) ? Bookmarks = 0: Bookmarks;
 
         var searchstringRatings = 'Всего голосов';
         var index = html.search(searchstringRatings);
         if (index >= 0) {
             var pos = index + searchstringRatings.length;
             var Ratings = html.substring(pos, pos + 700);
-            Ratings = +Ratings.match(/\+\d{1,4}/);
-            (!Ratings || Ratings === undefined) ? Ratings = 0: Ratings;
+            // Logger.log(`Ratings = ${Ratings}`);
+            Ratings = +Ratings.match(/\+\d{1,4}/);            
         }
+        (!Ratings || Ratings === undefined) ? Ratings = 0: Ratings;
 
         Logger.log(`Для ${url}:\nПросмотры = ${Views} \nКомментарии = ${Comments} \nЗакладки = ${Bookmarks} \nРейтинг = ${Ratings}.`);
         return `${Views}|${Comments}|${Bookmarks}|${Ratings}`;
@@ -138,8 +139,8 @@ function pikabu_ru(url) {
             var Bookmarks = html.substring(pos + 45, pos + 65);
             // Logger.log(`Bookmarks = ${Bookmarks}`);
             Bookmarks = +Bookmarks.match(/\d{1,4}/);
-            (!Bookmarks || Bookmarks === undefined) ? Bookmarks = 0: Bookmarks;
         }
+        (!Bookmarks || Bookmarks === undefined) ? Bookmarks = 0: Bookmarks;
         
         let Ratings = (html.match(/<div class="story__rating-count">(\d+)<\/div>/) || [0, 0])[1];
         Logger.log(`Для ${url}:\nПросмотры = ${Views} \nКомментарии = ${Comments} \nЗакладки = ${Bookmarks} \nРейтинг = ${Ratings}.`);
@@ -200,9 +201,9 @@ function smart_lab_ru(url) {
             var pos = index + searchstringComments.length;
             var Comments = html.substring(pos + 228, pos + 250);
             // Logger.log(`Comments = ${Comments}`);
-            Comments = +Comments.match(/\d{1,4}/);
-            (!Comments || Comments === undefined) ? Comments = 0: Comments;
+            Comments = +Comments.match(/\d{1,4}/);            
         }
+        (!Comments || Comments === undefined) ? Comments = 0: Comments;
 
         var searchstringBookmarks = 'post-card__btn post-card__btn--favorite';
         var index = html.search(searchstringBookmarks);
@@ -210,9 +211,9 @@ function smart_lab_ru(url) {
             var pos = index + searchstringBookmarks.length;
             var Bookmarks = html.substring(pos + 240, pos + 265);
             // Logger.log(`Bookmarks = ${Bookmarks}`);
-            Bookmarks = +Bookmarks.match(/\d{1,4}/);
-            (!Bookmarks || Bookmarks === undefined) ? Bookmarks = 0: Bookmarks;
+            Bookmarks = +Bookmarks.match(/\d{1,4}/);            
         }
+        (!Bookmarks || Bookmarks === undefined) ? Bookmarks = 0: Bookmarks;
         
         var searchstringRatings = 'post-card__btn post-card__btn--like';
         var index = html.search(searchstringRatings);
@@ -220,9 +221,9 @@ function smart_lab_ru(url) {
             var pos = index + searchstringRatings.length;
             var Ratings = html.substring(pos + 228, pos + 250);
             // Logger.log(`Ratings = ${Ratings}`);
-            Ratings = +Ratings.match(/\d{1,4}/);
-            (!Ratings || Ratings === undefined) ? Ratings = 0: Ratings;
+            Ratings = +Ratings.match(/\d{1,4}/);            
         }
+        (!Ratings || Ratings === undefined) ? Ratings = 0: Ratings;
 
         // Логирование и возврат значений
         Logger.log(`Для ${url}:\nПросмотры = ${Views} \nКомментарии = ${Comments} \nЗакладки = ${Bookmarks} \nРейтинг = ${Ratings}.`);
