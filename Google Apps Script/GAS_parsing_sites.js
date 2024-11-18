@@ -7,7 +7,7 @@
  * @author Mikhail Shardin [Михаил Шардин] 
  * @site https://shardin.name/
  * 
- * Last updated: 23.09.2024
+ * Last updated: 18.11.2024
  * 
  */
 
@@ -70,7 +70,7 @@ function youtube_com(url) {
 
 // Функция для тестирования запроса на Habr
 function test_Habr() {
-    var url = 'https://habr.com/ru/companies/habr/articles/814357/';
+    var url = 'https://habr.com/ru/articles/857402/';
     VCBR = habr_com(url);
 }
 
@@ -144,13 +144,15 @@ function pikabu_ru(url) {
 
 // Функция для тестирования запроса на Smart Lab
 function test_smart_lab_ru() {
-    var url = 'https://smart-lab.ru/mobile/topic/1055572/';
+    var url = 'https://smart-lab.ru/mobile/topic/1083556/';
     VCBR = smart_lab_ru(url);
 }
 
-// Функция для получения статистики темы с Smart Lab
+// Функция для получения статистики с Smart Lab
 function smart_lab_ru(url) {
     try {
+        var html = UrlFetchApp.fetch(url).getContentText();
+
         // Извлечение идентификатора темы из URL
         const topicId = url.match(/topic\/(\d+)/)[1];
 
@@ -173,11 +175,6 @@ function smart_lab_ru(url) {
         const response = UrlFetchApp.fetch(apiUrl, options).getContentText();
         Logger.log(`Ответ API: ${response}.`);
 
-        // Проверка, что ответ не пуст
-        if (!response) {
-            throw new Error("Пустой ответ от сервера.");
-        }
-
         // Ответ имеет формат: func8422(1055572,1787);
         // Извлечение просмотров путем разделения строки по символам
         let startIndex = response.indexOf('(') + 1;
@@ -187,10 +184,35 @@ function smart_lab_ru(url) {
         // Первый номер — это topicId, а второй — это количество просмотров
         let Views = numbers[1] ? parseInt(numbers[1].trim()) : 0;
 
-        // Заполнение комментариев, закладок и рейтинга вопросительными знаками
-        let Comments = "?";
-        let Bookmarks = "?";
-        let Ratings = "?";
+        var searchstringComments = 'post-card__btn post-card__btn--comment';
+        var index = html.search(searchstringComments);
+        if (index >= 0) {
+            var pos = index + searchstringComments.length;
+            var Comments = html.substring(pos + 228, pos + 250);
+            // Logger.log(`Comments = ${Comments}`);
+            Comments = +Comments.match(/\d{1,4}/);
+            (!Comments || Comments === undefined) ? Comments = 0: Comments;
+        }
+
+        var searchstringBookmarks = 'post-card__btn post-card__btn--favorite';
+        var index = html.search(searchstringBookmarks);
+        if (index >= 0) {
+            var pos = index + searchstringBookmarks.length;
+            var Bookmarks = html.substring(pos + 240, pos + 265);
+            // Logger.log(`Bookmarks = ${Bookmarks}`);
+            Bookmarks = +Bookmarks.match(/\d{1,4}/);
+            (!Bookmarks || Bookmarks === undefined) ? Bookmarks = 0: Bookmarks;
+        }
+        
+        var searchstringRatings = 'post-card__btn post-card__btn--like';
+        var index = html.search(searchstringRatings);
+        if (index >= 0) {
+            var pos = index + searchstringRatings.length;
+            var Ratings = html.substring(pos + 228, pos + 250);
+            // Logger.log(`Ratings = ${Ratings}`);
+            Ratings = +Ratings.match(/\d{1,4}/);
+            (!Ratings || Ratings === undefined) ? Ratings = 0: Ratings;
+        }
 
         // Логирование и возврат значений
         Logger.log(`Для ${url}:\nПросмотры = ${Views} \nКомментарии = ${Comments} \nЗакладки = ${Bookmarks} \nРейтинг = ${Ratings}.`);
