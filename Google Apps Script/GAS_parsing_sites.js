@@ -112,7 +112,7 @@ function habr_com(url) {
 
 // Функция для тестирования запроса на Pikabu
 function test_Pikabu() {
-    var url = 'https://pikabu.ru/story/kak_ya_pri_pomoshchi_dvukh_skriptov_smog_avtomaticheski_sgenerirovat_opis_dokumentov_dlya_700_stranits_11812093';
+    var url = 'https://pikabu.ru/story/moy_pervyiy_i_neudachnyiy_opyit_poiska_torgovoy_strategii_dlya_moskovskoy_birzhi_12033190';
     VCBR = pikabu_ru(url);
 }
 
@@ -130,7 +130,17 @@ function pikabu_ru(url) {
         var html = UrlFetchApp.fetch(url).getContentText();
         let Views = json.data.v || 0;
         let Comments = (html.match(/<span class="story__comments-link-count">(\d+)<\/span>/) || [0, 0])[1];
-        let Bookmarks = "?";
+        
+        var searchstringBookmarks = 'story__save hint';
+        var index = html.search(searchstringBookmarks);
+        if (index >= 0) {
+            var pos = index + searchstringBookmarks.length;
+            var Bookmarks = html.substring(pos + 45, pos + 65);
+            // Logger.log(`Bookmarks = ${Bookmarks}`);
+            Bookmarks = +Bookmarks.match(/\d{1,4}/);
+            (!Bookmarks || Bookmarks === undefined) ? Bookmarks = 0: Bookmarks;
+        }
+        
         let Ratings = (html.match(/<div class="story__rating-count">(\d+)<\/div>/) || [0, 0])[1];
         Logger.log(`Для ${url}:\nПросмотры = ${Views} \nКомментарии = ${Comments} \nЗакладки = ${Bookmarks} \nРейтинг = ${Ratings}.`);
         return `${Views}|${Comments}|${Bookmarks}|${Ratings}`;
