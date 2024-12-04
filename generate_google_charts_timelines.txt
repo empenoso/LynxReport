@@ -1,0 +1,55 @@
+
+    dataTable.addColumn({
+        type: 'string',
+        id: 'Заголовок'
+    });
+    dataTable.addColumn({
+        type: 'string',
+        id: 'Название'
+    });
+    dataTable.addColumn({
+        type: 'date',
+        id: 'Start'
+    });
+    dataTable.addColumn({
+        type: 'date',
+        id: 'End'
+    });
+    dataTable.addRows([
+
+        // Начало вставки из сгенерированного файла generate_google_charts_timelines
+        ["Публикации","https://habr.com: 66 шт.",new Date(2019, 10),new Date(2024, 11)],
+        ["Публикации","https://smart-lab.ru: 10 шт.",new Date(2024, 8),new Date(2024, 11)],
+        ["Публикации","https://pikabu.ru: 14 шт.",new Date(2024, 8),new Date(2024, 11)],
+        ["Публикации","https://rationalanswer.club: 2 шт.",new Date(2024, 10),new Date(2024, 11)],
+        ["Публикации","https://t.me: 11 шт.",new Date(2019, 2),new Date(2024, 11)],
+        ["Публикации","https://sprut.ai: 3 шт.",new Date(2024, 4),new Date(2024, 11)],
+        ["Публикации","https://vc.ru: 6 шт.",new Date(2019, 10),new Date(2024, 11)],
+        ["Публикации","https://journal.tinkoff.ru: 49 шт.",new Date(2020, 3),new Date(2024, 10)],
+        ["Публикации","https://github.com: 10 шт.",new Date(2019, 8),new Date(2023, 6)],
+        ["Публикации","https://podcast.ru: 1 шт.",new Date(2022, 10),new Date(2022, 11)],
+        ["Публикации","https://www.youtube.com: 19 шт.",new Date(2020, 8),new Date(2022, 6)],
+        ["Публикации","https://medium.com: 1 шт.",new Date(2020, 1),new Date(2020, 2)],
+        ["Публикации","https://zen.yandex.ru: 1 шт.",new Date(2019, 11),new Date(2019, 12)],
+        ["Публикации","https://3dtoday.ru: 13 шт.",new Date(2018, 8),new Date(2018, 11)],
+        ["Публикации","Журнал Инновации и инвестиции: 2 шт.",new Date(2018, 3),new Date(2018, 5)],
+        ["Публикации","Сборник ПНИПУ: 7 шт.",new Date(2012, 3),new Date(2017, 5)],
+        ["Публикации","https://z-wave.ru: 16 шт.",new Date(2014, 10),new Date(2015, 4)],
+        ["Публикации","https://special.habrahabr.ru: 1 шт.",new Date(2015, 3),new Date(2015, 4)],
+        ["Публикации","Учебно-методическое пособие для студентов: 1 шт.",new Date(2013, 5),new Date(2013, 6)],
+        ["Публикации","Патент: 1 шт.",new Date(2011, 5),new Date(2011, 6)],
+        ["Публикации","Журнал Строительные и дорожные машины: 1 шт.",new Date(2011, 5),new Date(2011, 6)],
+        ["Публикации","Журнал Механизация строительства: 1 шт.",new Date(2011, 4),new Date(2011, 5)],
+        ["Публикации","Сборник ПГТУ: 12 шт.",new Date(2006, 3),new Date(2011, 5)],
+        ["Публикации","Сборник СибАДИ: 5 шт.",new Date(2006, 4),new Date(2010, 5)],
+        ["Публикации","Учебное пособие для студентов: 1 шт.",new Date(2007, 9),new Date(2007, 10)],
+        ["Публикации","Газета За рулем - регион. Пермский край: 38 шт.",new Date(2004, 5),new Date(2006, 6)],
+        ["Публикации","Журнал Мир Дорог: 1 шт.",new Date(2006, 4),new Date(2006, 5)],
+        ["Публикации","Журнал АЗС: 6 шт.",new Date(2003, 11),new Date(2006, 3)],
+        ["Публикации","https://www.zr.ru: 1 шт.",new Date(2006, 2),new Date(2006, 3)],
+        ["Публикации","Журнал Фаворит дороги: 1 шт.",new Date(2005, 8),new Date(2005, 9)],
+        ["Публикации","Журнал Домашний компьютер: 2 шт.",new Date(2004, 5),new Date(2005, 5)],
+        ["Публикации","http://old.computerra.ru: 1 шт.",new Date(2004, 2),new Date(2004, 3)],
+        ["Публикации","Компьютерный еженедельник Компьютерра: 1 шт.",new Date(2004, 2),new Date(2004, 3)],
+        // Выборка сгенерирована 04.12.2024, 14:13:09 
+    
