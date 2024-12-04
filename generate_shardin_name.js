@@ -15,7 +15,6 @@
  * 
  */
 
-const secrets = require('./secrets/secret'); // ключи доступа и идентификаторы
 const fs = require("fs")
 const puppeteer = require('puppeteer')
 const moment = require('moment')
@@ -31,7 +30,7 @@ const {
     console.log("LynxReport: учёт публикаций 📚 [Node.js Release] начала работу в %s. \n", (new Date()).toLocaleString("ru-ru"))
 
     // Аутентификация с использованием учетных данных сервисного аккаунта
-    const credentials = require('./secrets/credentials.json');
+    const credentials = require('./secrets/credentials.json'); // https://console.cloud.google.com/apis/credentials
 
     const serviceAccountAuth = new JWT({
         email: credentials.client_email, // Email сервисного аккаунта
